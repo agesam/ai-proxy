@@ -1,8 +1,12 @@
 export default {
-    async fetch(request, env) {
+    async fetch(request) {
+        const apiKey = Deno.env.get("OPENROUTER_API_KEY"); // ✅ 正確讀取
+        if (!apiKey) {
+            return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
+        }
+
         const url = new URL(request.url);
 
-        // 處理 CORS 預檢請求 (OPTIONS)
         if (request.method === 'OPTIONS') {
             return new Response(null, {
                 headers: {
@@ -13,7 +17,6 @@ export default {
             });
         }
 
-        // 處理 OpenRouter API 的 POST 請求
         if (request.method !== 'POST') {
             return new Response('NOTHING HERE', { status: 405 });
         }
@@ -26,7 +29,7 @@ export default {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${env.OPENROUTER_API_KEY}`
+                    'Authorization': `Bearer ${apiKey}` // ✅ 改用 Deno.env.get()
                 },
                 body: JSON.stringify(requestBody),
             });
@@ -49,7 +52,3 @@ export default {
         }
     },
 };
-
-
-
-
