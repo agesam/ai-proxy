@@ -15,7 +15,7 @@ export default {
 
         // 處理 OpenRouter API 的 POST 請求
         if (request.method !== 'POST') {
-            return new Response(env.OPENROUTER_API_KEY, { status: 405 });
+            return new Response('Method Not Allowed', { status: 405 });
         }
 
         try {
