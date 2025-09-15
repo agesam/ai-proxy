@@ -48,5 +48,4 @@ export default {
             return new Response(`Error: ${e.message}`, { status: 500 });
         }
     },
-
 };
