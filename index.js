@@ -1,8 +1,9 @@
 export default {
     async fetch(request) {
-        const apiKey = Deno.env.get("OPENROUTER_API_KEY"); // ✅ 正確讀取
+        // 🔑 變更：從 Deno 環境變數取得你的 Nebulablock API 金鑰
+        const apiKey = Deno.env.get("nebulablock_key");
         if (!apiKey) {
-            return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
+            return new Response("Missing nebulablock_key", { status: 500 });
         }
 
         const url = new URL(request.url);
@@ -23,15 +24,30 @@ export default {
 
         try {
             const requestBody = await request.json();
-            const openrouterUrl = 'https://openrouter.ai/api/v1/chat/completions';
+            // 🔑 變更：使用 Nebulablock 的 API 端點
+            const nebulablockUrl = 'https://inference.nebulablock.com/v1/chat/completions';
+            
+            // 🔑 變更：傳送給 Nebulablock 的請求主體
+            // 你的前端會傳入 messages 和 model，你只需將它傳遞過去
+            const newRequestBody = {
+                messages: requestBody.messages,
+                model: requestBody.model,
+                // Nebulablock 範例的參數
+                max_tokens: requestBody.max_tokens,
+                temperature: requestBody.temperature,
+                top_p: requestBody.top_p,
+                // 你的前端可能需要 stream: true 來實現串流效果
+                stream: requestBody.stream,
+            };
 
-            const newRequest = new Request(openrouterUrl, {
+            const newRequest = new Request(nebulablockUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}` // ✅ 改用 Deno.env.get()
+                    // 🔑 變更：使用 Nebulablock 的 API 金鑰
+                    'Authorization': `Bearer ${apiKey}`
                 },
-                body: JSON.stringify(requestBody),
+                body: JSON.stringify(newRequestBody),
             });
 
             const response = await fetch(newRequest);
