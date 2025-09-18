@@ -19,7 +19,7 @@ export default {
         }
 
         if (request.method !== 'POST') {
-            return new Response(apiKey, { status: 405 });
+            return new Response("apiKey", { status: 405 });
         }
 
         try {
@@ -68,4 +68,5 @@ export default {
         }
     },
 };
+
 
