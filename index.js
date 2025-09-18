@@ -1,6 +1,6 @@
 export default {
     async fetch(request) {
-        const apiKey = "AIzaSyACY1grDNEuxuBWXvWTPTp3FPnH0bMNWyM"; // ✅ 正確讀取
+        const apiKey = Deno.env.get("Gemini"); // ✅ 正確讀取
         if (!apiKey) {
             return new Response("Missing Gemini_API_KEY", { status: 500 });
         }
