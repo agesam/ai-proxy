@@ -1,6 +1,6 @@
 export default {
     async fetch(request) {
-        const apiKey = Deno.env.get("OPENROUTER_API_KEY"); // ✅ 正確讀取
+        const apiKey = Deno.env.get("nebulablock_key"); // ✅ 正確讀取
         if (!apiKey) {
             return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
         }
@@ -23,7 +23,7 @@ export default {
 
         try {
             const requestBody = await request.json();
-            const openrouterUrl = 'https://openrouter.ai/api/v1/chat/completions';
+            const openrouterUrl = 'https://inference.nebulablock.com/v1/chat/completions';
 
             const newRequest = new Request(openrouterUrl, {
                 method: 'POST',
@@ -52,3 +52,4 @@ export default {
         }
     },
 };
+
