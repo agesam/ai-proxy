@@ -1,8 +1,8 @@
 export default {
     async fetch(request) {
-        const apiKey = Deno.env.get("OPENROUTER_API_KEY"); // ✅ 正確讀取
+        const apiKey = "AIzaSyACY1grDNEuxuBWXvWTPTp3FPnH0bMNWyM"; // ✅ 正確讀取
         if (!apiKey) {
-            return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
+            return new Response("Missing Gemini_API_KEY", { status: 500 });
         }
 
         const url = new URL(request.url);
@@ -23,7 +23,7 @@ export default {
 
         try {
             const requestBody = await request.json();
-            const openrouterUrl = 'https://openrouter.ai/api/v1/chat/completions';
+            const openrouterUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent';
 
             const newRequest = new Request(openrouterUrl, {
                 method: 'POST',
