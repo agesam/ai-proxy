@@ -1,9 +1,9 @@
 export default {
     async fetch(request) {
         // 🔑 變更：從 Deno 環境變數取得你的 Nebulablock API 金鑰
-        const apiKey = Deno.env.get("nebulablock_key");
+        const apiKey = Deno.env.get("NEBULA_API_KEY");
         if (!apiKey) {
-            return new Response("Missing nebulablock_key", { status: 500 });
+            return new Response("Missing NEBULA_API_KEY", { status: 500 });
         }
 
         const url = new URL(request.url);
@@ -19,7 +19,7 @@ export default {
         }
 
         if (request.method !== 'POST') {
-            return new Response("apiKey", { status: 405 });
+            return new Response('NOTHING HERE', { status: 405 });
         }
 
         try {
@@ -68,5 +68,3 @@ export default {
         }
     },
 };
-
-
