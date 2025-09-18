@@ -1,13 +1,11 @@
 export default {
     async fetch(request) {
-        const apiKey = Deno.env.get("NEBULA_API_KEY");
-
-        // ✅ 新增：在 Deno Deploy 日誌中列印 API 金鑰，方便偵錯
-        console.log("從環境變數讀取到的 API 金鑰值：", apiKey);
-
+        const apiKey = Deno.env.get("OPENROUTER_API_KEY"); // ✅ 正確讀取
         if (!apiKey) {
-            return new Response("錯誤：找不到 NEBULA_API_KEY 環境變數。", { status: 500 });
+            return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
         }
+
+        const url = new URL(request.url);
 
         if (request.method === 'OPTIONS') {
             return new Response(null, {
@@ -25,24 +23,15 @@ export default {
 
         try {
             const requestBody = await request.json();
-            
-            const nebulablockUrl = 'https://inference.nebulablock.com/v1/chat/completions';
-            
-            // 讓代理伺服器更靈活，直接傳遞前端發來的所有參數
-            const newRequestBody = {
-                messages: requestBody.messages,
-                model: requestBody.model,
-                stream: requestBody.stream,
-                ...requestBody // 將其他所有參數一併傳遞
-            };
+            const openrouterUrl = 'https://openrouter.ai/api/v1/chat/completions';
 
-            const newRequest = new Request(nebulablockUrl, {
+            const newRequest = new Request(openrouterUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
+                    'Authorization': `Bearer ${apiKey}` // ✅ 改用 Deno.env.get()
                 },
-                body: JSON.stringify(newRequestBody),
+                body: JSON.stringify(requestBody),
             });
 
             const response = await fetch(newRequest);
@@ -59,7 +48,7 @@ export default {
             });
 
         } catch (e) {
-            return new Response(`錯誤：處理請求時發生問題：${e.message}`, { status: 500 });
+            return new Response(`Error: ${e.message}`, { status: 500 });
         }
     },
 };
