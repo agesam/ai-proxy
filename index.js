@@ -1,12 +1,13 @@
 export default {
     async fetch(request) {
-        // 🔑 變更：從 Deno 環境變數取得你的 Nebulablock API 金鑰
         const apiKey = Deno.env.get("NEBULA_API_KEY");
-        if (!apiKey) {
-            return new Response("Missing NEBULA_API_KEY", { status: 500 });
-        }
 
-        const url = new URL(request.url);
+        // ✅ 新增：在 Deno Deploy 日誌中列印 API 金鑰，方便偵錯
+        console.log("從環境變數讀取到的 API 金鑰值：", apiKey);
+
+        if (!apiKey) {
+            return new Response("錯誤：找不到 NEBULA_API_KEY 環境變數。", { status: 500 });
+        }
 
         if (request.method === 'OPTIONS') {
             return new Response(null, {
@@ -24,27 +25,21 @@ export default {
 
         try {
             const requestBody = await request.json();
-            // 🔑 變更：使用 Nebulablock 的 API 端點
+            
             const nebulablockUrl = 'https://inference.nebulablock.com/v1/chat/completions';
             
-            // 🔑 變更：傳送給 Nebulablock 的請求主體
-            // 你的前端會傳入 messages 和 model，你只需將它傳遞過去
+            // 讓代理伺服器更靈活，直接傳遞前端發來的所有參數
             const newRequestBody = {
                 messages: requestBody.messages,
                 model: requestBody.model,
-                // Nebulablock 範例的參數
-                max_tokens: requestBody.max_tokens,
-                temperature: requestBody.temperature,
-                top_p: requestBody.top_p,
-                // 你的前端可能需要 stream: true 來實現串流效果
                 stream: requestBody.stream,
+                ...requestBody // 將其他所有參數一併傳遞
             };
 
             const newRequest = new Request(nebulablockUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // 🔑 變更：使用 Nebulablock 的 API 金鑰
                     'Authorization': `Bearer ${apiKey}`
                 },
                 body: JSON.stringify(newRequestBody),
@@ -64,7 +59,7 @@ export default {
             });
 
         } catch (e) {
-            return new Response(`Error: ${e.message}`, { status: 500 });
+            return new Response(`錯誤：處理請求時發生問題：${e.message}`, { status: 500 });
         }
     },
 };
