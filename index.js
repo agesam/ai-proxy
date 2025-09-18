@@ -29,7 +29,7 @@ export default {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}` // ✅ 改用 Deno.env.get()
+                    'Authorization': f`Bearer {os.environ.get(${apiKey})` // ✅ 改用 Deno.env.get()
                 },
                 body: JSON.stringify(requestBody),
             });
@@ -52,4 +52,5 @@ export default {
         }
     },
 };
+
 
