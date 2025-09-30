@@ -38,6 +38,10 @@ function buildSystemPrompt(externalData, conversationHistory) {
     2. 使用適合兒童的老師語氣，保持回答有趣，可多用emoji，吸引使用者注意力
     3. 當對話中出現【圖庫】中的關鍵字，會附上資料庫中的對照【圖片連結】
         **例子** https://artgardenofeden.com.hk/image/dolphin001.webp
+    4. 當回應中有任何連結時，不要加入任何符號
+         範例：
+             **https://artgardenofeden.com.hk** <-- 錯誤
+             https://artgardenofeden.com.hk <-- 正確
     4. 優先根據知識庫【早慧資料】及【圖庫】內容來回答問題
     5. 不要編造或猜測任何資料中沒有的內容，可以適當擴展知識，但不要偏離核心內容。
     6. 當回答涉及【早慧資料】中【分校資訊】、【課程資料】等結構化數據時，你必須使用標準的 **HTML TABLE** 標籤來呈現資料，而不是純文字。請確保使用 <thead>、<tbody>、<tr>、<th> 和 <td>。
@@ -145,5 +149,6 @@ export default {
         }
     },
 };
+
 
 
