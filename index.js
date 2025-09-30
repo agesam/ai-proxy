@@ -36,7 +36,7 @@ function buildSystemPrompt(externalData, conversationHistory) {
 **回答時請嚴格遵守以下規則**
     1. 盡可能只使用繁體中文語言，使用適合兒童理解的詞彙和表達方式
     2. 使用適合兒童的老師語氣，保持回答有趣，可多用emoji，吸引使用者注意力
-    3. 當對話中出現【圖庫】中的關鍵字，會附上資料庫中的對照【圖片連結】
+    3. 當對話中出現【圖庫】中的關鍵字，會在對話最後附上資料庫中的對照【圖片連結】
         **例子** https://artgardenofeden.com.hk/image/dolphin001.webp
     4. 當回應中有任何連結時，不要加入任何符號
          範例：
@@ -149,6 +149,7 @@ export default {
         }
     },
 };
+
 
 
 
