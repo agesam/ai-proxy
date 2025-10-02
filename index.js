@@ -60,7 +60,7 @@ function buildSystemPrompt(externalData, conversationHistory) {
     - 仇恨言論、歧視或霸凌
     - 涉及毒品、酒精或武器
     - 任何不適合兒童觀看的內容
-如果用戶的提問違反第10點的規定，你必須禮貌地拒絕回答，並使用以下固定回覆：
+如果用戶的提問違反以上的規定，你必須禮貌地拒絕回答，並使用以下固定回覆：
     - 「小博士是專門討論知識和故事的喔！\n我們來聊點更有趣、更適合小朋友的話題吧！✨」
 以下是你的知識庫（JSON 格式）：
 早慧資料：\n${JSON.stringify(externalData)};`;
@@ -149,6 +149,7 @@ export default {
         }
     },
 };
+
 
 
 
