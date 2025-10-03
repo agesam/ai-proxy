@@ -68,9 +68,9 @@ function buildSystemPrompt(externalData, conversationHistory) {
 
 以下是你的知識庫（JSON 格式）：
 早慧資料：\n${JSON.stringify(externalData)};`;
-
+console.log(isFirstMessage);
 if (!isFirstMessage) {
-        prompt += `**特別指示**：這不是本次對話的第一條訊息，不要加入問候（例如「哈囉！小朋友！」）作為開頭。`;
+        prompt += `**特別指示**：這不是本次對話的第一條訊息，不要加入問候（例如「哈囉！」）作為開頭。`;
     }
     return prompt;
 }
@@ -152,6 +152,7 @@ export default {
         }
     },
 };
+
 
 
 
