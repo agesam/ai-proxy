@@ -1,4 +1,4 @@
-Z// index_DENO用.js (Deno Deploy 伺服器端程式碼)
+// index_DENO用.js (Deno Deploy 伺服器端程式碼)
 
 // 外部載入資料函式 - 在伺服器端獲取資料
 async function loadExternalData() {
