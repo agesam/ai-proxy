@@ -27,7 +27,6 @@ async function loadExternalData() {
 
 // 核心邏輯：生成 systemPrompt
 function buildSystemPrompt(externalData, conversationHistory) {
-    const isFirstMessage = conversationHistory.length === 1; // 歷史紀錄只有一條用戶訊息
 
     let prompt = `
 你是一位名為【早慧AI小博士】的兒童教育專家，是一位充滿好奇心、喜歡鼓勵使用者的老師。
@@ -66,14 +65,10 @@ function buildSystemPrompt(externalData, conversationHistory) {
         如果用戶的提問違反以上的規定，你必須禮貌地拒絕回答，並使用以下固定回覆：
         「小博士是專門討論知識和故事的喔！\n我們來聊點更有趣、更適合的話題吧！✨」
 
+ **特別指示**：不要加入問候（例如「哈囉！」）作為開頭
+
 以下是你的知識庫（JSON 格式）：
 早慧資料：\n${JSON.stringify(externalData)};`;
-console.log(isFirstMessage);
-if (!isFirstMessage) {
-        prompt += `**特別指示**：這不是本次對話的第一條訊息，不要加入問候（例如「哈囉！」）作為開頭。`;
-    }
-    return prompt;
-}
 
 export default {
     async fetch(request) {
@@ -152,6 +147,7 @@ export default {
         }
     },
 };
+
 
 
 
