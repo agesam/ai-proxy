@@ -69,6 +69,7 @@ function buildSystemPrompt(externalData, conversationHistory) {
 
 以下是你的知識庫（JSON 格式）：
 早慧資料：\n${JSON.stringify(externalData)};`;
+}
 
 export default {
     async fetch(request) {
