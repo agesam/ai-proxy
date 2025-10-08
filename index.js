@@ -114,6 +114,7 @@ export default {
                 temperature: temperature || 0.6,
                 max_tokens: max_tokens || 500,
                 stream: stream !== undefined ? stream : true,
+                zdr: true,
             };
             
             const openrouterUrl = 'https://openrouter.ai/api/v1/chat/completions';
@@ -146,4 +147,5 @@ export default {
         }
     },
 };
+
 
