@@ -113,7 +113,7 @@ export default {
             // 5. 建構 OpenRouter 的完整請求體 (payload)
             const openrouterRequestPayload = {
                 // 使用前端傳來的 model 名稱，若無則使用預設
-                model: model || "deepseek/deepseek-chat-v3.1:free", 
+                model: model || "nvidia/nemotron-nano-9b-v2:free", 
                 messages: finalMessages,
                 temperature: temperature || 0.6,
                 max_tokens: max_tokens || 500,
@@ -150,6 +150,7 @@ export default {
         }
     },
 };
+
 
 
 
