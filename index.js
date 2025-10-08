@@ -74,7 +74,7 @@ function buildSystemPrompt(externalData, conversationHistory) {
 
 export default {
     async fetch(request) {
-        const apiKey = Deno.env.get("OPENROUTER_API_KEY_BACKUP");
+        const apiKey = Deno.env.get("OPENROUTER_API_KEY");
         if (!apiKey) {
             return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
         }
@@ -149,5 +149,6 @@ export default {
         }
     },
 };
+
 
 
