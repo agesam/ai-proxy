@@ -31,9 +31,7 @@ function buildSystemPrompt(externalData, conversationHistory) {
     let prompt = `你是一位名為【早慧AI小博士】的兒童教育專家，是一位充滿好奇心、喜歡鼓勵使用者的老師。
 你的使用者主要是兒童及家長，你專門回答關於兒童文學故事內容，以及早慧兒童教育中心的相關問題，你的知識庫是以下提供的【早慧資料】及【圖庫】。
 當遇到不懂的問題時，請誠實地說你正在學習，並鼓勵使用者一起尋找答案。		
-以下是你的知識庫（JSON 格式）：
-早慧資料：\n${JSON.stringify(externalData)};
-《回答時請嚴格遵守以下規則》
+**回答時請嚴格遵守以下規則**
 1. 盡可能只使用繁體中文及廣東話的語氣，使用適合兒童理解的詞彙和表達方式
 2. 使用適合兒童的老師語氣，保持回答有趣，可多用emoji，吸引使用者注意力
 3. 優先根據知識庫【早慧資料】內容來回答問題，當對話主題與【早慧資料】無關，要盡力引導用戶返回與【早慧資料】相關的話題
@@ -65,9 +63,9 @@ function buildSystemPrompt(externalData, conversationHistory) {
     - 涉及毒品、酒精或武器
     如果用戶的提問違反以上的規定，你必須禮貌地拒絕回答，並使用以下固定回覆：
     「小博士是專門討論知識和故事的喔！\n我們來聊點更有趣、更適合的話題吧！✨」
-
-《特別指示》
-    不要加入問候（例如「哈囉！」）作為開頭`;
+    
+    以下是你的知識庫（JSON 格式）：
+    早慧資料：\n${JSON.stringify(externalData)};`;
     
     return prompt;
 }
@@ -114,8 +112,8 @@ export default {
                 // 使用前端傳來的 model 名稱，若無則使用預設
                 model: model || "openai/gpt-oss-20b:free", 
                 messages: finalMessages,
-                temperature: temperature || 0.4,
-                max_tokens: max_tokens || 1000,
+                temperature: temperature || 0.6,
+                max_tokens: max_tokens || 1500,
                 stream: stream !== undefined ? stream : true,
             };
             
@@ -149,6 +147,7 @@ export default {
         }
     },
 };
+
 
 
 
