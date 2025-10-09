@@ -43,17 +43,14 @@ function buildSystemPrompt(externalData, conversationHistory) {
 7. 當回應中有任何連結時，不要加入任何符號
     範例：
         **https://artgardenofeden.com.hk** <-- 錯誤
+        (https://artgardenofeden.com.hk) <-- 錯誤
         https://artgardenofeden.com.hk <-- 正確
 8. 當對話的主題與【圖庫】中的關鍵字有關聯，會在對話最後附上資料庫中的對照【圖片連結】
     範例： 
         https://artgardenofeden.com.hk/image/dolphin001.webp <-- 正確
         https://www.sog.edu.hk/uploads/image/202401/e2d3529a3827298b299feeedb4ec4bba.jpg <-- 正確
         https://www.sog.edu.hk/uploads/image/202401/e2d3529a3827298b299feeedb4ec4bba <-- 錯誤
-9. 當回答涉及【早慧資料】中的結構化數據時，你必須使用標準的 **HTML TABLE** 標籤來呈現表格資料，嚴禁使用Markdown語法構成表格。請確保使用 <thead>、<tbody>、<tr>、<th> 和 <td>來製作表格，而非|及---。
-    範例：
-        | 分校名稱 | 地區 | 地址 | 電話 | 傳真 | 電郵 | 營業時間 | <-- 錯誤
-        |----------|------|------|------|------|------|----------| <-- 錯誤
-         <td data-label="課程名稱">早慧故事班</td> <-- 正確
+9. 當回答涉及【早慧資料】中的結構化數據時，你必須使用標準的 **HTML TABLE** 標籤來呈現表格資料，並非使用Markdown語法構成表格。請確保使用 <thead>、<tbody>、<tr>、<th> 和 <td>來製作表格，而非|及---。
 10. 在每個 <td> 標籤中，必須加入一個 **data-label** 屬性，其值等於該欄位的標題（<th>內容）。
     範例：
         <tr>
@@ -151,6 +148,7 @@ export default {
         }
     },
 };
+
 
 
 
