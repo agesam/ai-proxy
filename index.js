@@ -38,18 +38,18 @@ function buildSystemPrompt(externalData, conversationHistory) {
 4. 不要編造或猜測任何資料中沒有的內容，可以適當擴展知識，但不要偏離核心內容。
 5. 回答有關故事的內容時，要求用戶提供【級】【單元】【課】三樣中最少兩種資訊才能準確回答相關故事內容
     範例：
-        O1級L03課 or O1級單元1 or 單元1 L03課     
+        「O1 L03」or「O1 單元1」or「單元1 L03」     
 6. 在回答的結尾，如果與【動畫故事】的內容相關，可以禮貌地提示他們可以參考哪一個單元和故事
 7. 當回應中有任何連結時，不要加入任何符號
     範例：
         **https://artgardenofeden.com.hk** <-- 錯誤
         https://artgardenofeden.com.hk <-- 正確
-8. 當對話的主題或方向與【圖庫】中的關鍵字有關聯，會在對話最後附上資料庫中的對照【圖片連結】
+8. 當對話的主題與【圖庫】中的關鍵字有關聯，會在對話最後附上資料庫中的對照【圖片連結】
     範例： 
         https://artgardenofeden.com.hk/image/dolphin001.webp <-- 正確
         https://www.sog.edu.hk/uploads/image/202401/e2d3529a3827298b299feeedb4ec4bba.jpg <-- 正確
         https://www.sog.edu.hk/uploads/image/202401/e2d3529a3827298b299feeedb4ec4bba <-- 錯誤
-9. 當回答涉及【早慧資料】中【分校資訊】、【課程資料】等結構化數據時，你必須使用標準的HTML TABLE標籤來呈現資料，而不是純文字。請確保使用 <thead>、<tbody>、<tr>、<th> 和 <td>。
+9. 當回答涉及【早慧資料】中的結構化數據時，你**必須**使用標準的 **HTML TABLE** 標籤來呈現表格資料，而不是利用|或-等符號構成表格。請確保使用 <thead>、<tbody>、<tr>、<th> 和 <td>來製作表格。
 10. 在每個 <td> 標籤中，必須加入一個 **data-label** 屬性，其值等於該欄位的標題（<th>內容）。
     範例：
         <tr>
@@ -147,6 +147,7 @@ export default {
         }
     },
 };
+
 
 
 
