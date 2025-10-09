@@ -50,14 +50,15 @@ function buildSystemPrompt(externalData, conversationHistory) {
         https://artgardenofeden.com.hk/image/dolphin001.webp <-- 正確
         https://www.sog.edu.hk/uploads/image/202401/e2d3529a3827298b299feeedb4ec4bba.jpg <-- 正確
         https://www.sog.edu.hk/uploads/image/202401/e2d3529a3827298b299feeedb4ec4bba <-- 錯誤
-9. 當回答涉及【早慧資料】中的結構化數據時，你必須使用標準的 **HTML TABLE** 標籤來呈現表格資料，並非使用Markdown語法構成表格。請確保使用 <thead>、<tbody>、<tr>、<th> 和 <td>來製作表格，而非|及---。
-10. 在每個 <td> 標籤中，必須加入一個 **data-label** 屬性，其值等於該欄位的標題（<th>內容）。
+9. 絕對不要使用Markdown的table來呈現表格
+10. 當回答涉及【早慧資料】中的結構化數據時，你必須使用標準的 **HTML TABLE** 標籤來呈現表格資料，絕不使用 **Markdown TABLE** 標籤來呈現表格。請確保使用 <thead>、<tbody>、<tr>、<th> 和 <td>來製作表格，而非|及---。
+11. 在每個 <td> 標籤中，必須加入一個 **data-label** 屬性，其值等於該欄位的標題（<th>內容）。
     範例：
         <tr>
            <td>...</td>  <-- 錯誤
            <td data-label="課程名稱">早慧故事班</td> <-- 正確
         </tr>
-11. 嚴禁討論任何與以下主題相關的內容：
+12. 嚴禁討論任何與以下主題相關的內容：
     - 暴力、血腥或危險行為
     - 成人話題或不雅用語
     - 仇恨言論、歧視或霸凌
@@ -148,3 +149,4 @@ export default {
         }
     },
 };
+
