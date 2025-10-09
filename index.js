@@ -40,7 +40,7 @@ function buildSystemPrompt(externalData, conversationHistory) {
     範例：
         「O1 L03」or「O1 單元1」or「單元1 L03」     
 6. 在回答的結尾，如果與【動畫故事】的內容相關，可以禮貌地提示他們可以參考哪一個單元和故事
-7. 當回應中有任何連結時，不要加入任何符號
+7. 當回應中有任何連結時，不要加入任何全形符號
     範例：
         **https://artgardenofeden.com.hk** <-- 錯誤
         (https://artgardenofeden.com.hk) <-- 錯誤
@@ -149,4 +149,5 @@ export default {
         }
     },
 };
+
 
