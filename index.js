@@ -1,5 +1,45 @@
 // index_DENO用.js (Deno Deploy 伺服器端程式碼)
 
+// URL Regex (與前端 AI.js 使用的最新版本相同)
+const urlRegex = /(https?:\/\/[^\s]+?)(?=[^\w\s]*(\s|$))/gi;
+
+// 輔助函式：獲取網頁標題
+async function getPageTitle(url) {
+    // 使用 try/catch 處理網路錯誤和超時
+    try {
+        const controller = new AbortController();
+        // 設置 3 秒超時，防止單個無響應連結拖垮整個 API
+        const timeoutId = setTimeout(() => controller.abort(), 3000); 
+        
+        // 限制只接受 HTML 內容
+        const response = await fetch(url, { 
+            signal: controller.signal, 
+            headers: { 'Accept': 'text/html', 'User-Agent': 'Deno AI Proxy' } 
+        });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) return url; 
+
+        // 讀取響應文本
+        const html = await response.text();
+        // 使用正則表達式從 HTML 中提取 <title> 標籤內容
+        const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
+        
+        if (titleMatch && titleMatch[1]) {
+            // 返回 Markdown 格式的連結 [Title](URL)
+            const title = titleMatch[1].trim().replace(/\s+/g, ' '); 
+            
+            // 由於 AI.js 前端是基於 Markdown 處理，我們返回 Markdown 格式
+            return `[${title}](${url})`; 
+        }
+
+        return url; // 未找到標題，返回原始 URL
+    } catch (error) {
+        // console.error(`獲取標題失敗 (${url}):`, error.message); // 可以在 Deno Log 中查看錯誤
+        return url; // 發生錯誤，返回原始 URL
+    }
+}
+
 // 外部載入資料函式 - 在伺服器端獲取資料
 async function loadExternalData() {
     // 這是您的 Google Apps Script URL，現在在後端執行
@@ -105,17 +145,17 @@ export default {
             // 4. 建構最終要傳給 OpenRouter 的 messages 陣列
             const finalMessages = [
                 { role: "system", content: systemPromptContent },
-                ...conversation_history // 將歷史訊息展開
+                ...conversation_history 
             ];
 
             // 5. 建構 OpenRouter 的完整請求體 (payload)
             const openrouterRequestPayload = {
-                // 使用前端傳來的 model 名稱，若無則使用預設
                 model: model || "openai/gpt-oss-20b:free", 
                 messages: finalMessages,
                 temperature: temperature || 0.6,
                 max_tokens: max_tokens || 1500,
-                stream: stream !== undefined ? stream : true,
+                // *** 【修改點 1】為實現連結標題替換，必須關閉串流 ***
+                stream: false, 
             };
             
             const openrouterUrl = 'https://openrouter.ai/api/v1/chat/completions';
@@ -126,34 +166,54 @@ export default {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${apiKey}`
                 },
-                body: JSON.stringify(openrouterRequestPayload), // 傳送伺服器建構的 payload
+                body: JSON.stringify(openrouterRequestPayload), 
             });
 
+            // 6. 發送請求並等待完整的 JSON 響應
             const response = await fetch(newRequest);
 
             const newHeaders = new Headers(response.headers);
             newHeaders.set('Access-Control-Allow-Origin', '*');
             newHeaders.set('Access-Control-Allow-Methods', 'POST');
             newHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+            newHeaders.set('Content-Type', 'application/json'); // 確保回傳 JSON
 
-            return new Response(response.body, {
-                status: response.status,
-                statusText: response.statusText,
+            if (!response.ok) {
+                // 如果 OpenRouter 返回錯誤，直接返回錯誤響應
+                return new Response(response.body, { status: response.status, headers: newHeaders });
+            }
+            
+            // 7. 讀取完整的 AI 響應 JSON
+            const openrouterResponseJson = await response.json();
+            let aiContent = openrouterResponseJson.choices[0].message.content;
+
+            // 8. *** 【核心邏輯】處理 URL 轉標題 ***
+            const urls = aiContent.match(urlRegex) || [];
+            const uniqueUrls = [...new Set(urls)];
+
+            // 並行獲取所有標題
+            const titlePromises = uniqueUrls.map(url => getPageTitle(url));
+            const replacements = await Promise.all(titlePromises);
+
+            // 替換文本中的原始 URL 為帶有標題的 Markdown 連結
+            for (let i = 0; i < uniqueUrls.length; i++) {
+                // 替換時需要轉義特殊字符
+                const regex = new RegExp(uniqueUrls[i].replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+                aiContent = aiContent.replace(regex, replacements[i]);
+            }
+            // *** 處理結束 ***
+
+            // 9. 將處理後的內容放回 JSON 結構中
+            openrouterResponseJson.choices[0].message.content = aiContent;
+
+            // 10. 返回最終的 JSON 響應給前端
+            return new Response(JSON.stringify(openrouterResponseJson), {
+                status: 200,
                 headers: newHeaders,
             });
 
         } catch (e) {
-            // 捕捉載入資料和請求 API 的錯誤，並返回給前端
             return new Response(`Error: ${e.message}`, { status: 500 });
         }
     },
 };
-
-
-
-
-
-
-
-
-
