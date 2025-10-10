@@ -103,7 +103,7 @@ export default {
         try {
             // 1. 接收前端傳來的簡化資料
             // 【修正：新增 top_p, frequency_penalty, presence_penalty 參數接收】
-            const { conversation_history, model, temperature, max_tokens, stream, top_p, frequency_penalty, presence_penalty } = await request.json();
+            const { conversation_history, model, temperature, max_tokens, stream, top_p} = await request.json();
             
             // 2. 伺服器端載入外部資料
             const externalData = await loadExternalData();
@@ -126,10 +126,6 @@ export default {
                 temperature: temperature || 0.2, 
                 // 【新增】top_p 預設 0.9，平衡多樣性與準確性
                 top_p: top_p || 0.9,             
-                // 【新增】頻率懲罰預設 0.5，減少重複用詞
-                frequency_penalty: frequency_penalty || 0.5, 
-                // 【新增】出現懲罰預設 0.3，鼓勵引入新主題
-                presence_penalty: presence_penalty || 0.3,   
                 max_tokens: max_tokens || 1500,
                 stream: stream !== undefined ? stream : true,
             };
@@ -164,4 +160,5 @@ export default {
         }
     },
 };
+
 
