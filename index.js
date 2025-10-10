@@ -43,7 +43,7 @@ function buildSystemPrompt(externalData, conversationHistory) {
 6. 當內容與資料庫中的【動畫故事】相關，可以提示他們參考哪一個單元和故事。
     範例：
 		如果你對小丑魚有興趣，可以參考O1單元一的《小丑魚、海葵和寄居蟹》喔！
-7. 當回應中有任何連結時，不要加入任何全形符號。
+7. 連結輸出時，你**絕對不允許**在網址（URL）前後加上任何符號（包括全形和半形的括號、引號、星號等等）。連結必須是純文字格式，例如：https://example.com。
     範例：
         **https://artgardenofeden.com.hk** <-- 錯誤
         （https://artgardenofeden.com.hk） <-- 錯誤
@@ -160,6 +160,7 @@ export default {
         }
     },
 };
+
 
 
 
