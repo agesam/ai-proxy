@@ -74,14 +74,14 @@ function buildSystemPrompt(externalData, conversationHistory) {
     // 絕對不能虛構或猜測資訊。
     
     以下是你的知識庫（JSON 格式）：
-    早慧資料：\n${JSON.stringify(externalData)}`;
+    早慧資料：${JSON.stringify(externalData)}`;
     
     return prompt;
 }
 
 export default {
     async fetch(request) {
-        const apiKey = Deno.env.get("OPENROUTER_API_KEY_BACKUP");
+        const apiKey = Deno.env.get("OPENROUTER_API_KEY");
         if (!apiKey) {
             return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
         }
@@ -102,8 +102,7 @@ export default {
 
         try {
             // 1. 接收前端傳來的簡化資料
-            const { conversation_history, model, temperature, max_tokens, stream } = await request.json();
-            
+            const { conversation_history, model, temperature, max_tokens, stream, top_p } = await request.json();
             // 2. 伺服器端載入外部資料
             const externalData = await loadExternalData();
 
@@ -121,8 +120,9 @@ export default {
                 // 使用前端傳來的 model 名稱，若無則使用預設
                 model: model || "openai/gpt-oss-20b:free", 
                 messages: finalMessages,
-                // 【修正】降低預設溫度，以減少幻覺和創造性
+                // 降低預設溫度，以減少幻覺和創造性
                 temperature: temperature || 0.2, 
+				top_p: top_p || 0.9,  
                 max_tokens: max_tokens || 1500,
                 stream: stream !== undefined ? stream : true,
             };
