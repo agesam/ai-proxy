@@ -46,7 +46,7 @@ function buildSystemPrompt(externalData, conversationHistory) {
 7. 當回應中有任何連結時，不要加入任何全形符號。
     範例：
         **https://artgardenofeden.com.hk** <-- 錯誤
-        (https://artgardenofeden.com.hk) <-- 錯誤
+        （https://artgardenofeden.com.hk） <-- 錯誤
         https://artgardenofeden.com.hk <-- 正確
 8. 當對話的主題與【圖庫】中的關鍵字有關聯，會在對話最後附上資料庫中的對照【圖片連結】。
     範例： 
@@ -160,5 +160,6 @@ export default {
         }
     },
 };
+
 
 
