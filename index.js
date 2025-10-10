@@ -62,11 +62,19 @@ function buildSystemPrompt(externalData, conversationHistory) {
     - 成人話題或不雅用語
     - 仇恨言論、歧視或霸凌
     - 涉及毒品、酒精或武器
-    如果用戶的提問違反以上的規定，你必須禮貌地拒絕回答，並使用以下固定回覆：
+如果用戶的提問違反以上的規定，你必須禮貌地拒絕回答，並使用以下固定回覆：
     「小博士是專門討論知識和故事的喔！\n我們來聊點更有趣、更適合的話題吧！✨」
     
+    
+    // 【修正：加強對知識庫的限制】
+    
+    // ！！！重要警告：對於所有涉及分校、地址、課程、價格等結構化事實，你**必須且只能**使用以下提供的JSON數據。
+    // 如果知識庫中沒有相關數據（例如不存在的分校），你必須**立即且禮貌地拒絕**，使用固定回覆：
+    // 「我無法找到相關資料，請提供更詳細的資訊。」
+    // 絕對不能虛構或猜測資訊。
+    
     以下是你的知識庫（JSON 格式）：
-    早慧資料：\n${JSON.stringify(externalData)};`;
+    早慧資料：\n${JSON.stringify(externalData)}`;
     
     return prompt;
 }
@@ -113,7 +121,8 @@ export default {
                 // 使用前端傳來的 model 名稱，若無則使用預設
                 model: model || "openai/gpt-oss-20b:free", 
                 messages: finalMessages,
-                temperature: temperature || 0.6,
+                // 【修正】降低預設溫度，以減少幻覺和創造性
+                temperature: temperature || 0.2, 
                 max_tokens: max_tokens || 1500,
                 stream: stream !== undefined ? stream : true,
             };
@@ -148,7 +157,3 @@ export default {
         }
     },
 };
-
-
-
-
