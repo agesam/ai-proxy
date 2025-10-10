@@ -39,9 +39,7 @@ function buildSystemPrompt(externalData, conversationHistory) {
 5. 回答有關故事的內容時，要求用戶提供【級】【單元】【課】三樣中最少兩種資訊才能準確回答相關故事內容
     範例：
         「O1 L03」or「O1 單元1」or「單元1 L03」     
-6. 在回答的結尾，當提及到與【動畫故事】的內容相關，可以禮貌地提示他們可以參考哪一個單元和故事
-	範例：
-		如果你對小丑魚有興趣，可以參考O1單元一的《小丑魚、海葵和寄居蟹》喔！
+6. 在回答的結尾，如果與【動畫故事】的內容相關，可以禮貌地提示他們可以參考哪一個單元和故事
 7. 當回應中有任何連結時，不要加入任何全形符號
     範例：
         **https://artgardenofeden.com.hk** <-- 錯誤
@@ -64,26 +62,24 @@ function buildSystemPrompt(externalData, conversationHistory) {
     - 成人話題或不雅用語
     - 仇恨言論、歧視或霸凌
     - 涉及毒品、酒精或武器
-如果用戶的提問違反以上的規定，你必須禮貌地拒絕回答，並使用以下固定回覆：
+    如果用戶的提問違反以上的規定，你必須禮貌地拒絕回答，並使用以下固定回覆：
     「小博士是專門討論知識和故事的喔！\n我們來聊點更有趣、更適合的話題吧！✨」
     
-    
-    // 【修正：加強對知識庫的限制】
-    
+    // 【修正：加強對知識庫的限制，防止捏造】
     // ！！！重要警告：對於所有涉及分校、地址、課程、價格等結構化事實，你**必須且只能**使用以下提供的JSON數據。
     // 如果知識庫中沒有相關數據（例如不存在的分校），你必須**立即且禮貌地拒絕**，使用固定回覆：
     // 「我無法找到相關資料，請提供更詳細的資訊。」
     // 絕對不能虛構或猜測資訊。
-    
+
     以下是你的知識庫（JSON 格式）：
-    早慧資料：${JSON.stringify(externalData)}`;
+    早慧資料：\n${JSON.stringify(externalData)};`;
     
     return prompt;
 }
 
 export default {
     async fetch(request) {
-        const apiKey = Deno.env.get("OPENROUTER_API_KEY");
+        const apiKey = Deno.env.get("OPENROUTER_API_KEY_BACKUP");
         if (!apiKey) {
             return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
         }
@@ -104,7 +100,9 @@ export default {
 
         try {
             // 1. 接收前端傳來的簡化資料
-            const { conversation_history, model, temperature, max_tokens, stream, top_p } = await request.json();
+            // 【修正：新增 top_p, frequency_penalty, presence_penalty 參數接收】
+            const { conversation_history, model, temperature, max_tokens, stream, top_p, frequency_penalty, presence_penalty } = await request.json();
+            
             // 2. 伺服器端載入外部資料
             const externalData = await loadExternalData();
 
@@ -122,9 +120,14 @@ export default {
                 // 使用前端傳來的 model 名稱，若無則使用預設
                 model: model || "openai/gpt-oss-20b:free", 
                 messages: finalMessages,
-                // 降低預設溫度，以減少幻覺和創造性
+                // 【修正】降低預設溫度至 0.2，以減少幻覺
                 temperature: temperature || 0.2, 
-				top_p: top_p || 0.9,  
+                // 【新增】top_p 預設 0.9，平衡多樣性與準確性
+                top_p: top_p || 0.9,             
+                // 【新增】頻率懲罰預設 0.5，減少重複用詞
+                frequency_penalty: frequency_penalty || 0.5, 
+                // 【新增】出現懲罰預設 0.3，鼓勵引入新主題
+                presence_penalty: presence_penalty || 0.3,   
                 max_tokens: max_tokens || 1500,
                 stream: stream !== undefined ? stream : true,
             };
@@ -159,4 +162,3 @@ export default {
         }
     },
 };
-
