@@ -61,7 +61,7 @@ function buildSystemPrompt(externalData, conversationHistory) {
 如果你對小丑魚有興趣，可以參考O1單元一的《小丑魚、海葵和寄居蟹》喔！
 
 [Question]
-💡請問……，……呢？
+請問……，……呢？
 
 [Options]
 A. 答案
@@ -135,7 +135,7 @@ export default {
                 temperature: temperature || 0.4, 
                 // top_p 預設 0.9，平衡多樣性與準確性
                 top_p: top_p || 0.9,             
-                max_tokens: max_tokens || 4096,
+                max_tokens: max_tokens || 1500,
                 stream: stream !== undefined ? stream : true,
             };
             
@@ -169,6 +169,7 @@ export default {
         }
     },
 };
+
 
 
 
