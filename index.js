@@ -93,7 +93,7 @@ B. 答案
 
 export default {
     async fetch(request) {
-        const apiKey = Deno.env.get("OPENROUTER_API_KEY");
+        const apiKey = Deno.env.get("OPENROUTER_API_KEY_BACKUP");
         if (!apiKey) {
             return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
         }
@@ -172,6 +172,7 @@ export default {
         }
     },
 };
+
 
 
 
