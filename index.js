@@ -40,8 +40,6 @@ function buildSystemPrompt(externalData, conversationHistory) {
     範例：
     如果你對小丑魚有興趣，可以參考O1單元一的《小丑魚、海葵和寄居蟹》喔！
 6. 只有當對話的主題與JSON數據的【圖庫】中的關鍵字有關聯，會在對話最後附上資料庫中的對照【圖片連結】。
-    範例：
-    ![海豚](https://artgardenofeden.com.hk/image/dolphin001.webp) <-- 正確
 7. 當回答涉及【早慧資料】中的結構化數據時，在每個 <td> 標籤中，必須加入一個 【data-label】 屬性，其值等於該欄位的標題（<th>內容）。
     範例：
     <tr>
@@ -172,6 +170,7 @@ export default {
         }
     },
 };
+
 
 
 
