@@ -40,7 +40,10 @@ function buildSystemPrompt(externalData, conversationHistory) {
     範例：
     如果你對小丑魚有興趣，可以參考O1單元一的《小丑魚、海葵和寄居蟹》喔！
 6. 盡可能就只使用【Markdown語法】，或使用【HTML語法】。
-7. 只有當對話的主題與JSON數據的【圖庫】中的關鍵字有關聯，會在對話最後附上資料庫中使用【Markdown語法】的相應【圖片連結】。
+7. 只有當對話的主題與JSON數據的【圖庫】中的關鍵字有關聯，會在對話最後附上資料庫中使用【Markdown語法】或【HTML語法】的相應【圖片連結】。
+    範例：
+    <img>https://artgardenofeden.com.hk/image/clownfish001.webp</img> <-- 正確
+    ![小丑魚](https://artgardenofeden.com.hk/image/clownfish001.webp) <-- 正確
 8. 當回答涉及【早慧資料】中的結構化數據時，請使用【Markdown語法】建構出表格。
 9. 如試用【HTML語法表格】，請在每個 <td> 標籤中，必須加入一個 【data-label】 屬性，其值等於該欄位的標題（<th>內容）。
     範例：
@@ -176,6 +179,7 @@ export default {
         }
     },
 };
+
 
 
 
