@@ -1,21 +1,18 @@
 // index_DENO用.js (Deno Deploy 伺服器端程式碼)
 
 // -----------------------------------------------------------------------
-// 外部載入資料函式 - 在伺服器端獲取資料
+// 外部載入資料函式
 // -----------------------------------------------------------------------
 
 async function loadExternalData() {
-    // 這是您的 Google Apps Script URL，現在在後端執行
     const apiURL = "https://script.google.com/macros/s/AKfycbw1D1AKlVr_iaArk-JkxN0YZ-NjyyxMgH-h-CatrFrprJXaSSxSsc2YZROaBxapPTEZeg/exec"; 
     try {
         const response = await fetch(apiURL);
         if (!response.ok) {
-            // 拋出 HTTP 錯誤
             throw new Error(`HTTP error! 狀態碼: ${response.status} (${response.statusText})`);
         } 
         const allSheetsData = await response.json(); 	
         let combinedData = [];
-        // 將所有工作表（例如 "O1動畫資料"、"聯絡資訊" 等）的數據合併到一個陣列中
         for (const sheetName in allSheetsData) {
             if (Object.prototype.hasOwnProperty.call(allSheetsData, sheetName)) {
                 combinedData = combinedData.concat(allSheetsData[sheetName]);
@@ -24,21 +21,15 @@ async function loadExternalData() {
         return combinedData;
     } catch (error) {
         console.error('伺服器載入外部知識庫時發生錯誤:', error);
-        // 如果載入失敗，我們拋出錯誤，讓前端知道
         throw new Error('伺服器無法載入外部知識庫。');
     }
 }
 
 
 // -----------------------------------------------------------------------
-// 新增：資料格式化函式 (將 JSON 轉換為帶標籤的純文本，命名為「早慧資料庫」)
+// 資料格式化函式 (將 JSON 轉換為帶標籤的純文本，命名為「早慧資料庫」)
 // -----------------------------------------------------------------------
 
-/**
- * 將 JSON 陣列轉換為帶有明確標籤的純文本格式，供 AI 模型閱讀。
- * @param {Array<Object>} combinedData - 包含所有知識資訊的陣列。
- * @returns {string} 格式化的純文本字符串。
- */
 function formatCourseData(combinedData) {
     if (!combinedData || combinedData.length === 0) {
         return "\n\n【早慧資料庫開始】\n【早慧資料庫結束】\n\n";
@@ -46,15 +37,11 @@ function formatCourseData(combinedData) {
 
     let formattedText = "\n\n【早慧資料庫開始】\n";
     
-    // 遍歷資料並為每個項目創建清晰的文本塊
     combinedData.forEach((item, index) => {
         formattedText += `--- 記錄 #${index + 1} ---\n`;
         
-        // 遍歷項目中的所有鍵值對 (Key-Value Pairs)
         for (const key in item) {
             if (Object.prototype.hasOwnProperty.call(item, key)) {
-                // 使用明確的 Key: Value 格式
-                // 並替換可能造成混淆的標籤符號
                 const value = (item[key] || 'N/A').toString().replace(/【|】/g, ''); 
                 formattedText += `【${key}】: ${value}\n`;
             }
@@ -68,12 +55,11 @@ function formatCourseData(combinedData) {
 
 
 // -----------------------------------------------------------------------
-// 核心邏輯：生成 systemPrompt (已根據新資料格式和 ReAct 調整)
+// 核心邏輯：生成 systemPrompt
 // -----------------------------------------------------------------------
 
 function buildSystemPrompt(formattedData) {
 
-    // 完整的系統指令，已將 JSON 知識庫的描述替換為「早慧資料庫」
     let prompt = `你是一位名為【**早慧AI小博士**】的兒童教育專家，是一位充滿好奇心、喜歡鼓勵使用者的老師。
 你的使用者主要是兒童及家長，你專門回答關於兒童文學故事內容，以及早慧兒童教育中心的相關問題，你的知識庫是以下提供【早慧資料庫】的純文本數據。
 
@@ -106,10 +92,7 @@ function buildSystemPrompt(formattedData) {
     <td data-label="課程名稱">早慧故事班</td> <-- 正確
     </tr>
 10. 嚴禁討論或提供任何與以下主題相關的內容：
-【人身安全/暴力】(自殺、自殘、任何形式的暴力、非法活動、危險挑戰、毒品、槍械)；
-【不當內容】(性、色情、成人內容、仇恨言論、歧視、霸凌、粗口、血腥恐怖)；
-【個人隱私】(真實姓名、住址、電話、電郵等個人身份資訊 PII，不論是詢問或分享)；
-【誤導資訊/系統濫用】(醫療/法律建議、惡意謠言、試圖操縱系統或繞過規則)。
+【人身安全/暴力】、【不當內容】、【個人隱私】、【誤導資訊/系統濫用】。
 如果用戶的輸入或要求觸及上述任何規定，【必須】固定回覆以下句子，【不加入任何額外解釋】：
 「小博士是專門討論知識和故事的喔！\n我們來聊點更有趣、更適合的話題吧！✨」
 
@@ -154,9 +137,94 @@ B
 你好叻呀！答啱咗！「……」！依家，不如我哋繼續探討一下「……」呢個嘅主題？
 
 ---
-${formattedData}`; // 將格式化後的資料附加到指令的末尾
+${formattedData}`; 
     
     return prompt;
+}
+
+
+// -----------------------------------------------------------------------
+// 新增：加強版串流過濾與錯誤處理函數 (解決前端 TypeError)
+// -----------------------------------------------------------------------
+
+function streamFilter(originalStream) {
+    const decoder = new TextDecoder("utf-8");
+    const encoder = new TextEncoder();
+    let buffer = ""; 
+
+    const transformStream = new TransformStream({
+        transform(chunk, controller) {
+            buffer += decoder.decode(chunk);
+
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || ""; 
+
+            for (const line of lines) {
+                if (line.trim() === "") continue; 
+                
+                if (line.startsWith("data:")) {
+                    const dataContent = line.substring(5).trim();
+                    
+                    if (dataContent === '[DONE]') {
+                        controller.enqueue(encoder.encode(line + '\n'));
+                        continue; 
+                    }
+                    
+                    try {
+                        const json = JSON.parse(dataContent);
+                        
+                        // 【關鍵修復】：檢查是否為 OpenRouter 錯誤物件
+                        if (json.error) {
+                            console.error("OpenRouter/Provider Error Detected:", json.error.message, "Code:", json.error.code);
+                            
+                            // 1. 構建友好的錯誤訊息
+                            const providerName = json.error.metadata?.provider_name || '未知';
+                            const errorMessage = `【錯誤通知】服務供應商錯誤 (${json.error.code} - ${providerName}): ${json.error.message}。小博士暫時未能回應，請稍後再試。`;
+                            
+                            // 2. 構建一個前端 AI.js 預期格式的合成錯誤 Chunk
+                            // 這樣 AI.js 就不會因為缺少 choices[0] 而崩潰
+                            const syntheticChunk = {
+                                choices: [{
+                                    index: 0,
+                                    delta: { content: errorMessage },
+                                    finish_reason: "stop" 
+                                }]
+                            };
+
+                            // 3. 轉發合成錯誤 Chunk
+                            controller.enqueue(encoder.encode(`data: ${JSON.stringify(syntheticChunk)}\n`));
+                            
+                            // 4. 轉發 [DONE] 標記
+                            controller.enqueue(encoder.encode("data: [DONE]\n"));
+                            
+                            // 5. 立即終止串流，不再處理後續數據
+                            controller.terminate(); 
+                            return;
+                        }
+
+                        // 正常數據區塊 (有 choices/delta 內容)
+                        if (json.choices && json.choices.length > 0) {
+                             controller.enqueue(encoder.encode(line + '\n'));
+                        } 
+
+                    } catch (e) {
+                        // 處理 JSON 解析失敗，避免串流中斷
+                        console.error("Deno 串流解析 JSON 失敗:", e.message, "Line:", line);
+                    }
+                } else {
+                    // 忽略非 data: 開頭的行 (例如 OPENROUTER PROCESSING)
+                    console.warn("Deno 過濾掉非標準串流行:", line);
+                }
+            }
+        },
+        flush(controller) {
+            if (buffer) {
+                console.warn("Deno 串流結束時有剩餘緩衝:", buffer);
+            }
+        }
+    });
+
+    return originalStream.pipeThrough(transformStream);
 }
 
 
@@ -185,30 +253,22 @@ export default {
         }
 
         try {
-            // 1. 接收前端傳來的簡化資料
             const { conversation_history, model, temperature, max_tokens, stream, top_p } = await request.json();
             
-            // 2. 伺服器端載入外部資料 (會拋出錯誤如果失敗)
             const externalData = await loadExternalData(); 
-
-            // 3. 格式化資料為純文本標籤
             const formattedData = formatCourseData(externalData);
 
-            // 4. 結合系統指令和格式化後的資料
             const finalSystemPrompt = buildSystemPrompt(formattedData);
             
-            // 5. 建構最終要傳給 OpenRouter 的 messages 陣列
-            // 系統指令必須放在最前面
             const systemMessage = { role: "system", content: finalSystemPrompt };
             const finalMessages = [
                 systemMessage, 
-                ...conversation_history // 將歷史訊息展開
+                ...conversation_history 
             ];
 
-            // 6. 建構 OpenRouter 的完整請求體 (payload)
             const openrouterRequestPayload = {
                 model: model || "openai/gpt-oss-20b:free",
-                messages: finalMessages, // <-- 使用這個包含系統指令的陣列
+                messages: finalMessages, 
                 temperature: temperature || 0.4,
                 top_p: top_p || 0.9,
                 max_tokens: max_tokens || 1500,
@@ -223,7 +283,7 @@ export default {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${apiKey}`
                 },
-                body: JSON.stringify(openrouterRequestPayload), // 傳送伺服器建構的 payload
+                body: JSON.stringify(openrouterRequestPayload), 
             });
 
             const response = await fetch(newRequest);
@@ -234,14 +294,16 @@ export default {
             newHeaders.set('Access-Control-Allow-Methods', 'POST');
             newHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-            return new Response(response.body, {
+            // 【關鍵處】：將原始串流通過加強版過濾器
+            const filteredStream = response.body ? streamFilter(response.body) : null;
+
+            return new Response(filteredStream, {
                 status: response.status,
                 statusText: response.statusText,
                 headers: newHeaders,
             });
 
         } catch (e) {
-            // 捕捉載入資料和請求 API 的錯誤，並返回給前端
             return new Response(`Error: ${e.message}`, { status: 500 });
         }
     },
