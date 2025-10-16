@@ -79,7 +79,7 @@ C. 答案
 D. 答案
 
 [CorrectAnswer]
-B. 答案
+B.
 
 [WrongAnswer]
 雖然答錯咗，但係唔緊要！小博士會話你知，其實……！想唔想我再講多啲關於呢種「……」嘅故事呢？
@@ -91,6 +91,8 @@ B. 答案
 [CorrectAnswer] 必須只填寫正確選項的字母（A、B、C、D）。
 [WrongAnswer] 的內容可以用輕鬆的語氣隱喻出正確答案，令使用者下次能夠回答正確答案
 [NextTopic] 的內容，稱讚使用者選擇出你期待的該選項後，用於【下一步引導】和【提問】的內容。請務必詳細。
+
+【最終格式檢查】：如果輸出中 [Question]、[Options]、[CorrectAnswer]、[WrongAnswer]、[NextTopic] 任何一個標籤沒有獨立一行，或者包含了多餘字符，將導致前端程式崩潰。你作為一位專業的早慧AI小博士，絕不允許這種程式錯誤發生。
 
 以下是你的知識庫（JSON 格式）：
 早慧資料：\n${JSON.stringify(externalData)};`;
@@ -179,6 +181,7 @@ export default {
         }
     },
 };
+
 
 
 
