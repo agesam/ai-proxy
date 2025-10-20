@@ -50,9 +50,11 @@ async function loadExternalmaterialData() {
 }
 
 // 核心邏輯：生成 systemPrompt
-function buildSystemPrompt(externalData, externalmaterialData, conversationHistory) {
-    
- const COMMON_RULES_AND_SAFETY = `
+function buildSystemPrompt(externalData, externalmaterialData, promptMode) {
+ 	// 【模式選擇】
+    let selectedPromptTemplate;
+    
+	const COMMON_RULES_AND_SAFETY = `
 6. 當處理「圖片」「連結」等需要加入語法的資料時，請使用【Markdown語法】為主。
 7. 只有當對話的主題與JSON數據的【圖庫】中的關鍵字有關聯，會在對話最後附上資料庫中使用【Markdown語法】或【HTML語法】的相應【圖片連結】。
     範例：
@@ -140,7 +142,17 @@ B
 [WrongAnswer] 的內容可以用輕鬆的語氣隱喻出正確答案，令使用者下次能夠回答正確答案
 [NextTopic] 的內容，稱讚使用者選擇出你期待的該選項後，用於【下一步引導】和【提問】的內容。請務必詳細。`;
 
-    let combinedContext = STUDENT_PROMPT_TEMPLATE;
+	if (promptMode === "PARENT") {
+        // 模式 1: 家長模式 (前台工作人員)
+        selectedPromptTemplate = PARENT_PROMPT_TEMPLATE;
+        console.log("Backend Mode: PARENT_PROMPT_ADMIN");
+    } else {
+        // 模式 2: 學生模式 (老師) - 作為預設模式
+        selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE; 
+        console.log("Backend Mode: STUDENT_PROMPT_TEACHER (Default)");
+    }	  
+	
+    let combinedContext = selectedPromptTemplate;
 
     return combinedContext;
 
@@ -170,14 +182,14 @@ export default {
         try {
             // 1. 接收前端傳來的簡化資料
             // 【修正：新增 top_p, frequency_penalty, presence_penalty 參數接收】
-            const { conversation_history, model, temperature, max_tokens, stream, top_p} = await request.json();
+            const { promptMode, conversation_history, model, temperature, max_tokens, stream, top_p} = await request.json();
             
             // 2. 伺服器端載入外部資料
             const externalData = await loadExternalData();
             const externalmaterialData = await loadExternalmaterialData();
 
             // 3. 伺服器端建構 systemPrompt
-            const systemPromptContent = buildSystemPrompt(externalData, externalmaterialData, conversation_history);
+            const systemPromptContent = buildSystemPrompt(externalData, externalmaterialData, promptMode: promptMode || "STUDENT");
             
             // 4. 建構最終要傳給 OpenRouter 的 messages 陣列
             const finalMessages = [
