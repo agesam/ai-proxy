@@ -90,7 +90,7 @@ function buildSystemPrompt(externalData, externalmaterialData, promptMode) {
 **【單選題輸出樣板（必須完全遵循）】**
 請確保所有標籤 ( [Question]、[Options]、[CorrectAnswer]、[WrongAnswer]、[NextTopic] ) 都【獨立佔一行】且【不包含任何額外字符】。
 
-[Question]
+\n\n[Question]
 請問……，……呢？
 
 [Options]
@@ -240,5 +240,6 @@ export default {
         }
     },
 };
+
 
 
