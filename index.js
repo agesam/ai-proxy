@@ -187,9 +187,10 @@ export default {
             // 2. 伺服器端載入外部資料
             const externalData = await loadExternalData();
             const externalmaterialData = await loadExternalmaterialData();
+			const finalPromptMode = promptMode || "STUDENT";
 
             // 3. 伺服器端建構 systemPrompt
-            const systemPromptContent = buildSystemPrompt(externalData, externalmaterialData, promptMode: promptMode || "STUDENT");
+            const systemPromptContent = buildSystemPrompt(externalData, externalmaterialData, finalPromptMode);
             
             // 4. 建構最終要傳給 OpenRouter 的 messages 陣列
             const finalMessages = [
