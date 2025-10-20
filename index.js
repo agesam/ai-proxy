@@ -71,11 +71,9 @@ function buildSystemPrompt(externalData, externalmaterialData, conversationHisto
     if (isParentMode) {
         // 模式 1: 家長模式 (前台工作人員)
         selectedPromptTemplate = PARENT_PROMPT_TEMPLATE;
-        console.log("Mode: PARENT_PROMPT_ADMIN");
     } else {
         // 模式 2: 學生模式 (老師) - 作為預設模式
         selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE; 
-        console.log("Mode: STUDENT_PROMPT_TEACHER (Default)");
     }
     
     // === 模式定義與切換邏輯 END ===
@@ -141,6 +139,7 @@ function buildSystemPrompt(externalData, externalmaterialData, conversationHisto
 
     return combinedContext;
 }
+
 export default {
     async fetch(request) {
         const apiKey = Deno.env.get("OPENROUTER_API_KEY");
@@ -223,3 +222,4 @@ export default {
         }
     },
 };
+
