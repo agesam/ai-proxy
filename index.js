@@ -78,13 +78,13 @@ function buildSystemPrompt(externalData, externalmaterialData, promptMode) {
 
 // 🚩 QUSETION_TEMPLATE 的指令強化
 const QUSETION_TEMPLATE = `
-
+**【重要提醒：單選題流程】你必須先輸出主要內容，然後再輸出格式化的單選題。**
 **【輸出結構強制規範：絕對不可變動】**
 
 **[第一階段：主內容（必須）]**
 在開始單選題之前，你【必須】先生成一段與用戶提問相關的**主要知識或資訊**。這段內容應當：
 1. 長度適中，足以讓兒童理解並回答後續的問題。
-2. 內容必須基於你提供的知識庫。
+2. 內容必須基於知識庫【早慧資料】及【動畫教材資料】的JSON數據內容。
 3. **這段內容必須獨立存在，不能被任何標籤包裹。**
 
 **[第二階段：單選題（條件性）]**
@@ -153,16 +153,18 @@ const STUDENT_PROMPT_TEMPLATE = `你是一位名為【**早慧AI小博士**】�
 5. 當內容與資料庫中的【動畫教材資料】的JSON數據相關，可以提示他們參考哪一個單元和故事。
     範例：
     如果你對小丑魚有興趣，可以參考O1單元一的《小丑魚、海葵和寄居蟹》喔！
-
-**【重要提醒：單選題流程】你必須先輸出主要內容，然後再輸出格式化的單選題。**
 ` + COMMON_RULES_AND_SAFETY + QUSETION_TEMPLATE; 
 	
 	if (promptMode === "PARENT") {
         // 模式 1: 家長模式 (前台工作人員)
         selectedPromptTemplate = PARENT_PROMPT_TEMPLATE;
     } else {
-        // 模式 2: 學生模式 (老師) - 作為預設模式
-        selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE; 
+	        if (promptMode === "GAME") {
+				selectedPromptTemplate =  QUSETION_TEMPLATE; 
+			} else {
+				// 模式 2: 學生模式 (老師) - 作為預設模式
+	        	selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE; 
+			}
     }	  
 	
     let combinedContext = selectedPromptTemplate;
@@ -254,6 +256,7 @@ export default {
         }
     },
 };
+
 
 
 
