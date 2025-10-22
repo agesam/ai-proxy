@@ -153,7 +153,7 @@ const STUDENT_PROMPT_TEMPLATE = `你是一位名為【**早慧AI小博士**】�
 5. 當內容與資料庫中的【動畫教材資料】的JSON數據相關，可以提示他們參考哪一個單元和故事。
     範例：
     如果你對小丑魚有興趣，可以參考O1單元一的《小丑魚、海葵和寄居蟹》喔！
-` + COMMON_RULES_AND_SAFETY + QUSETION_TEMPLATE; 
+` + COMMON_RULES_AND_SAFETY; 
 	
 	if (promptMode === "PARENT") {
         // 模式 1: 家長模式 (前台工作人員)
@@ -252,6 +252,7 @@ export default {
         }
     },
 };
+
 
 
 
