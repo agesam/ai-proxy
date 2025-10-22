@@ -175,7 +175,7 @@ const STUDENT_PROMPT_TEMPLATE = `你是一位名為【**早慧AI小博士**】�
 
 export default {
     async fetch(request) {
-        const apiKey = Deno.env.get("OPENROUTER_API_KEY");
+        const apiKey = Deno.env.get("OPENROUTER_API_KEY_BACKUP");
         if (!apiKey) {
             return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
         }
@@ -257,6 +257,7 @@ export default {
         }
     },
 };
+
 
 
 
