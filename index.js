@@ -159,12 +159,8 @@ const STUDENT_PROMPT_TEMPLATE = `你是一位名為【**早慧AI小博士**】�
         // 模式 1: 家長模式 (前台工作人員)
         selectedPromptTemplate = PARENT_PROMPT_TEMPLATE;
     } else {
-	        if (promptMode === "GAME") {
-				selectedPromptTemplate =  QUSETION_TEMPLATE; 
-			} else {
-				// 模式 2: 學生模式 (老師) - 作為預設模式
-	        	selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE; 
-			}
+		// 模式 2: 學生模式 (老師) - 作為預設模式
+		selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE; 
     }	  
 	
     let combinedContext = selectedPromptTemplate;
@@ -256,6 +252,7 @@ export default {
         }
     },
 };
+
 
 
 
