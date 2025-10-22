@@ -50,7 +50,7 @@ async function loadExternalmaterialData() {
 }
 
 // 核心邏輯：生成 systemPrompt
-function buildSystemPrompt(externalData, externalmaterialData, promptMode) {
+function buildSystemPrompt(externalData, externalmaterialData, promptMode, GameMode) {
  	// 【模式選擇】
     let selectedPromptTemplate;
     
@@ -161,7 +161,11 @@ const STUDENT_PROMPT_TEMPLATE = `你是一位名為【**早慧AI小博士**】�
     } else {
 		// 模式 2: 學生模式 (老師) - 作為預設模式
 		selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE; 
-    }	  
+    }
+	
+	if (GameMode) {
+		selectedPromptTemplate = selectedPromptTemplate + QUSETION_TEMPLATE;
+	}
 	
     let combinedContext = selectedPromptTemplate;
 
@@ -193,15 +197,16 @@ export default {
         try {
             // 1. 接收前端傳來的簡化資料
             // 【修正：新增 top_p, frequency_penalty, presence_penalty 參數接收】
-            const { promptMode, conversation_history, model, temperature, max_tokens, stream, top_p} = await request.json();
+            const { GameMode, promptMode, conversation_history, model, temperature, max_tokens, stream, top_p} = await request.json();
             
             // 2. 伺服器端載入外部資料
             const externalData = await loadExternalData();
             const externalmaterialData = await loadExternalmaterialData();
 			const finalPromptMode = promptMode || "PARENT";
+			const finalGameMode = GameMode || false;
 
             // 3. 伺服器端建構 systemPrompt
-            const systemPromptContent = buildSystemPrompt(externalData, externalmaterialData, finalPromptMode);
+            const systemPromptContent = buildSystemPrompt(externalData, externalmaterialData, finalPromptMode, finalGameMode);
             
             // 4. 建構最終要傳給 OpenRouter 的 messages 陣列
             const finalMessages = [
@@ -252,6 +257,7 @@ export default {
         }
     },
 };
+
 
 
 
