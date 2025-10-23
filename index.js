@@ -66,7 +66,7 @@ function buildSystemPrompt(externalData, externalmaterialData, promptMode, GameM
     範例：
     <img>https://artgardenofeden.com.hk/image/clownfish001.webp</img> <-- 正確
     ![小丑魚](https://artgardenofeden.com.hk/image/clownfish001.webp) <-- 正確
-9. 當回答涉及結構化數據時，請使用【Markdown語法】或使用【HTML語法】建構出表格，請在每個 <td> 標籤中，必須加入一個 【data-label】 屬性，其值等於該欄位的標題（<th>內容）。
+9. 當回答涉及結構化數據時，請使用【Markdown語法】或【HTML語法】建構出表格，當使用【HTML語法】時，請在每個 <td> 標籤中，必須加入一個 【data-label】 屬性，其值等於該欄位的標題（<th>內容）。
     範例：
     <tr>
     <td data-label="課程名稱">早慧故事班</td> <-- 正確
@@ -255,6 +255,7 @@ export default {
         }
     },
 };
+
 
 
 
