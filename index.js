@@ -66,11 +66,7 @@ function buildSystemPrompt(externalData, externalmaterialData, promptMode, GameM
     範例：
     <img>https://artgardenofeden.com.hk/image/clownfish001.webp</img> <-- 正確
     ![小丑魚](https://artgardenofeden.com.hk/image/clownfish001.webp) <-- 正確
-9. 當回答涉及結構化數據時，請使用【Markdown語法】或【HTML語法】建構出表格，當使用【HTML語法】時，請在每個 <td> 標籤中，必須加入一個 【data-label】 屬性，其值等於該欄位的標題（<th>內容）。
-    範例：
-    <tr>
-    <td data-label="課程名稱">早慧故事班</td> <-- 正確
-    </tr>
+9. 當回答涉及結構化數據時，請使用【Markdown語法】或【HTML語法】建構出表格。
 10. 嚴禁討論或提供任何與以下主題相關的內容：
 【人身安全/暴力】(自殺、自殘、任何形式的暴力、非法活動、危險挑戰、毒品、槍械)；
 【不當內容】(性、色情、成人內容、仇恨言論、歧視、霸凌、粗口、血腥恐怖)；
@@ -255,6 +251,7 @@ export default {
         }
     },
 };
+
 
 
 
