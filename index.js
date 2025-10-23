@@ -156,15 +156,12 @@ B
 		// 模式 2: 學生模式 (老師) - 作為預設模式
 		selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE; 
     }
-	
 	if (GameMode) {
-		selectedPromptTemplate = selectedPromptTemplate + QUSETION_TEMPLATE;
+		// 模式 3: 學生GAME模式 (老師) 
+		selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE + QUSETION_TEMPLATE; 
 	}
 	
-    let combinedContext = selectedPromptTemplate;
-
-    return combinedContext;
-
+    return selectedPromptTemplate;
 }
 
 export default {
@@ -251,6 +248,7 @@ export default {
         }
     },
 };
+
 
 
 
