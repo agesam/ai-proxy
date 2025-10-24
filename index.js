@@ -62,7 +62,7 @@ function buildSystemPrompt(externalData, externalmaterialData, promptMode) {
 5. 嚴格遵守JSON數據知識庫內的資料內容，不編造、不猜測，只提供事實的信息。
 6. 當回答中需要用到JSON數據知識庫外的資訊時，可以使用通用知識回答，但回答中必須清楚註明【雖然我不太清楚，但是有可能是...】後再提供資訊。    
 7. 回答中可多用【Markdown語法】，令到排版更加美觀，使用者更加清晰易懂。
-8. 當對話中賁JSON數據知識庫的【圖庫】中的關鍵字有關聯，會在對話最後附上資料庫中使用【Markdown語法】或【HTML語法】的相應【圖片連結】。
+8. 當對話中的主題與JSON數據知識庫的【圖庫】中的關鍵字有關聯，可以在對話最後附上資料庫中使用【Markdown語法】或【HTML語法】的相應【圖片連結】。
     範例：
     <img>https://artgardenofeden.com.hk/image/clownfish001.webp</img> <-- 正確
     ![小丑魚](https://artgardenofeden.com.hk/image/clownfish001.webp) <-- 正確
@@ -238,6 +238,7 @@ export default {
         }
     },
 };
+
 
 
 
