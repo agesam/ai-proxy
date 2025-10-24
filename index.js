@@ -149,7 +149,7 @@ function retrieveRelevantData(knowledgeBase, userQuery, promptMode) {
     scoredData.sort((a, b) => b.score - a.score);
 
     // 限制檢索結果的數量 (例如 5 條)
-    const topN = 5; 
+    const topN = 20; 
     
     // 返回精簡後的資料項目陣列
     return scoredData.slice(0, topN).map(data => data.item);
@@ -354,4 +354,5 @@ export default {
         }
     },
 };
+
 
