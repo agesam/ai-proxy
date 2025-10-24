@@ -1,9 +1,28 @@
 // index_DENO用.js (Deno Deploy 伺服器端程式碼)
 
-// 外部載入資料函式 - 在伺服器端獲取資料
+// 快取物件結構: { data: <資料陣列>, timestamp: <快取建立時間戳> }
+let dataCache = {
+    早慧資料: null,
+    動畫教材資料: null
+};
+
+// 快取有效時間 (TTL)：60 分鐘 * 60 秒 * 1000 毫秒 = 3,600,000 毫秒
+const CACHE_TTL_MS = 60 * 60 * 1000;
+
+// 【整合快取邏輯】
 async function loadExternalData() {
-    // 這是您的 Google Apps Script URL，現在在後端執行
-    const apiURL = "https://script.google.com/macros/s/AKfycbw1D1AKlVr_iaArk-JkxN0YZ-NjyyxMgH-h-CatrFrprJXaSSxSsc2YZROaBxapPTEZeg/exec"; 
+    // 檢查快取是否有效 (未過期且資料存在)
+    const cacheEntry = dataCache.早慧資料;
+    const now = Date.now();
+    
+    // 如果快取存在且未過期，直接返回快取資料
+    if (cacheEntry && cacheEntry.data && (now - cacheEntry.timestamp < CACHE_TTL_MS)) {
+        console.log('快取命中：返回早慧資料快取。');
+        return cacheEntry.data;
+    }
+
+    // 快取失效或不存在，執行外部載入
+    const apiURL = "https://script.google.com/macros/s/AKfycbw1D1AKlVr_iaArk-JkxN0YZ-NjyyxMgH-h-CatrFrprJXaSSxSsc2YZROaBxapPTEZeg/exec"; 
     try {
         const response = await fetch(apiURL);
         if (!response.ok) {
@@ -17,17 +36,42 @@ async function loadExternalData() {
                 combinedData = combinedData.concat(allSheetsData[sheetName]);
             }
         }                
+
+        // 【新增：更新快取】
+        dataCache.早慧資料 = {
+            data: combinedData,
+            timestamp: Date.now()
+        };
+        console.log('成功載入並更新早慧資料快取。');
+
         return combinedData;
     } catch (error) {
         console.error('伺服器載入外部知識庫時發生錯誤:', error);
-        // 如果載入失敗，我們拋出錯誤，讓前端知道
+        // 如果載入失敗，我們檢查是否有舊的快取可以作為備用 (Graceful Degradation)
+        if (cacheEntry && cacheEntry.data) {
+            console.error('載入失敗，但返回舊的早慧資料快取作為備用。');
+            return cacheEntry.data;
+        }
+
+        // 如果載入失敗且沒有備用快取，則拋出錯誤
         throw new Error('伺服器無法載入外部知識庫。');
     }
 }
 
+// 【整合快取邏輯】
 async function loadExternalmaterialData() {
-    // 這是您的 Google Apps Script URL，現在在後端執行
-    const apiURL = "https://script.google.com/macros/s/AKfycbwCZLvFcqYvPFrBZJIrml5XdLsq3VNGCP9SK2DJfphYY53w5mGA2vdoa2v7EcasqIUJ/exec"; 
+    // 檢查快取是否有效 (未過期且資料存在)
+    const cacheEntry = dataCache.動畫教材資料;
+    const now = Date.now();
+    
+    // 如果快取存在且未過期，直接返回快取資料
+    if (cacheEntry && cacheEntry.data && (now - cacheEntry.timestamp < CACHE_TTL_MS)) {
+        console.log('快取命中：返回動畫教材資料快取。');
+        return cacheEntry.data;
+    }
+
+    // 快取失效或不存在，執行外部載入
+    const apiURL = "https://script.google.com/macros/s/AKfycbwCZLvFcqYvPFrBZJIrml5XdLsq3VNGCP9SK2DJfphYY53w5mGA2vdoa2v7EcasqIUJ/exec"; 
     try {
         const response = await fetch(apiURL);
         if (!response.ok) {
@@ -41,10 +85,25 @@ async function loadExternalmaterialData() {
                 combinedData = combinedData.concat(allSheetsData[sheetName]);
             }
         }                
+
+        // 【新增：更新快取】
+        dataCache.動畫教材資料 = {
+            data: combinedData,
+            timestamp: Date.now()
+        };
+        console.log('成功載入並更新動畫教材資料快取。');
+
         return combinedData;
     } catch (error) {
         console.error('伺服器載入外部知識庫時發生錯誤:', error);
-        // 如果載入失敗，我們拋出錯誤，讓前端知道
+
+        // 如果載入失敗，我們檢查是否有舊的快取可以作為備用 (Graceful Degradation)
+        if (cacheEntry && cacheEntry.data) {
+            console.error('載入失敗，但返回舊的動畫教材資料快取作為備用。');
+            return cacheEntry.data;
+        }
+
+        // 如果載入失敗且沒有備用快取，則拋出錯誤
         throw new Error('伺服器無法載入外部知識庫。');
     }
 }
@@ -238,10 +297,3 @@ export default {
         }
     },
 };
-
-
-
-
-
-
-
