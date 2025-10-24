@@ -75,6 +75,9 @@ function buildSystemPrompt(externalData, externalmaterialData, promptMode) {
 你必須先回覆「🙇‍♂️✨ 很抱歉，現在小博士唔太清楚以上內容，可能無法回答你的問題。
 不如你再試下問其他早慧兒童教育中心的資訊。⏳🙏」，之後再引導使用者返回到JSON數據知識庫內的話題。
 
+**注意** 
+【生成內容的字元絕對不可以超過4000字元】
+
 以下是你的知識庫（JSON 格式）：
 早慧資料：\n${JSON.stringify(externalData)};
 動畫教材資料：\n${JSON.stringify(externalmaterialData)};
@@ -197,11 +200,11 @@ export default {
                 // 使用前端傳來的 model 名稱，若無則使用預設
                 model: model || "openai/gpt-oss-20b:free", 
                 messages: finalMessages,
-                // 降低預設溫度，以減少幻覺
-                temperature: temperature || 0.4, 
+                // temperature 預設 0.3 低預設溫度以減少幻覺
+                temperature: temperature || 0.3, 
                 // top_p 預設 0.9，平衡多樣性與準確性
                 top_p: top_p || 0.9,             
-                max_tokens: max_tokens || 1500,
+                max_tokens: max_tokens || 4096,
                 stream: stream !== undefined ? stream : true,
             };
             
@@ -235,6 +238,7 @@ export default {
         }
     },
 };
+
 
 
 
