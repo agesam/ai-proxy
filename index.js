@@ -108,14 +108,61 @@ async function loadExternalmaterialData() {
     }
 }
 
+// 【新增函數】輕量級 RAG 檢索函數
+/**
+ * 根據使用者提問和對話模式，從知識庫中檢索相關的資料項目。
+ * @param {Array<Object>} knowledgeBase - 完整的 JSON 知識庫 (例如早慧資料或動畫教材資料)。
+ * @param {string} userQuery - 使用者最新的提問內容。
+ * @param {string} promptMode - 對話模式 ('PARENT' 或 'STUDENT')。
+ * @returns {Array<Object>} 檢索到的相關資料。
+ */
+function retrieveRelevantData(knowledgeBase, userQuery, promptMode) {
+    if (!knowledgeBase || knowledgeBase.length === 0 || !userQuery) {
+        return [];
+    }
+
+    // 1. 提取用於比對的關鍵詞
+    // 在簡單的 RAG 實現中，我們直接使用提問的詞語作為關鍵詞。
+    // 在更進階的實現中，可以使用 NLP/分詞技術。
+    const keywords = userQuery.toLowerCase().split(/\s+/).filter(word => word.length > 1);
+
+    // 如果沒有提取到關鍵詞，則返回空
+    if (keywords.length === 0) {
+        return [];
+    }
+    
+    // 2. 進行關鍵字比對和評分
+    const scoredData = knowledgeBase.map(item => {
+        let score = 0;
+        let content = JSON.stringify(item).toLowerCase(); // 將整個資料項目轉為字串進行搜索
+
+        for (const keyword of keywords) {
+            // 計算關鍵字在資料中出現的次數
+            const occurrences = (content.match(new RegExp(keyword, 'g')) || []).length;
+            score += occurrences;
+        }
+
+        return { item, score };
+    }).filter(data => data.score > 0); // 只保留相關性分數大於 0 的項目
+
+    // 3. 排序並選取最相關的 5 條資料
+    scoredData.sort((a, b) => b.score - a.score);
+
+    // 限制檢索結果的數量 (例如 5 條)
+    const topN = 5; 
+    
+    // 返回精簡後的資料項目陣列
+    return scoredData.slice(0, topN).map(data => data.item);
+}
+
 // 核心邏輯：生成 systemPrompt
-function buildSystemPrompt(externalData, externalmaterialData, promptMode) {
+function buildSystemPrompt(retrievedData, retrievedmaterialData, promptMode) {
  	// 【模式選擇】
     let selectedPromptTemplate;
 
 	// 🚩 基本共用的指令
 	const COMMON_RULES_AND_SAFETY = `
-4. 必須根據JSON數據知識庫【早慧資料】及【動畫教材資料】的內容來回答問題，當對話與JSON數據知識庫無關係時，可以使用通用知識回答，但須要盡力引導使用者返回到話題繼續對話。
+4. 必須根據JSON數據知識庫【精煉早慧資料】及【精煉動畫教材資料】的內容來回答問題，當對話與JSON數據知識庫無關係時，可以使用通用知識回答，但須要盡力引導使用者返回到話題繼續對話。
 	範例：
     想了解更多......相關資訊，可以參考......喔！
 5. 嚴格遵守JSON數據知識庫內的資料內容，不編造、不猜測，只提供事實的信息。
@@ -138,14 +185,14 @@ function buildSystemPrompt(externalData, externalmaterialData, promptMode) {
 【生成內容的字元絕對不可以超過4000字元】
 
 以下是你的知識庫（JSON 格式）：
-早慧資料：\n${JSON.stringify(externalData)};
-動畫教材資料：\n${JSON.stringify(externalmaterialData)};
+精煉早慧資料：\n${JSON.stringify(retrievedData)};
+精煉動畫教材資料：\n${JSON.stringify(retrievedmaterialData)};
 `;
 
 	// 🚩 家長模式 Prompt 模板 (前台工作人員)】
 	const PARENT_PROMPT_TEMPLATE = `你是一位名為【**早慧AI服務專員**】的【**前台工作人員**】。
 你的語氣專業、禮貌、清晰、簡潔，專門負責解答家長關於【早慧兒童教育中心】的行政、課程、分校、報名、學費等資訊。
-你的知識庫是以下提供的JSON數據【早慧資料】及【動畫教材資料】。
+你的知識庫是以下提供的JSON數據【精煉早慧資料】及【精煉動畫教材資料】。
 
 【回答時請強制遵守以下10條規則生成主內容】
 1. 任何情況下都只使用繁體中文及廣東話，使用專業、禮貌的語氣和表達方式。
@@ -156,7 +203,7 @@ function buildSystemPrompt(externalData, externalmaterialData, promptMode) {
 	// 🚩【學生模式 Prompt 模板 (老師)】
 	const STUDENT_PROMPT_TEMPLATE = `你是一位名為【**早慧AI小博士**】的兒童教育專家，是一位充滿好奇心、喜歡鼓勵使用者的老師。
 你的使用者主要是兒童及家長，你專門回答關於兒童文學故事內容、動物小知識以及早慧兒童教育中心的相關問題。
-你的知識庫是以下提供的JSON數據【早慧資料】及【動畫教材資料】。
+你的知識庫是以下提供的JSON數據【精煉早慧資料】及【精煉動畫教材資料】。
 
 **[第一階段：主內容（必須）]**
 【回答時請強制遵守以下10條規則生成主內容】
@@ -237,16 +284,27 @@ export default {
 
         try {
             // 1. 接收前端傳來的簡化資料
-            // 【修正：新增 top_p, frequency_penalty, presence_penalty 參數接收】
             const { GameMode, promptMode, conversation_history, model, temperature, max_tokens, stream, top_p} = await request.json();
             
-            // 2. 伺服器端載入外部資料
+            // 2. 伺服器端載入完整的外部資料 (這裡會用到快取)
             const externalData = await loadExternalData();
             const externalmaterialData = await loadExternalmaterialData();
 			const finalPromptMode = promptMode || "PARENT";
 
-            // 3. 伺服器端建構 systemPrompt
-            const systemPromptContent = buildSystemPrompt(externalData, externalmaterialData, finalPromptMode);
+            // 🚩 【新增 RAG 邏輯】提取最新使用者提問
+            // 由於 conversation_history 的最後一個元素一定是 user 的最新提問
+            const latestUserMessage = conversation_history.slice(-1)[0];
+            const userQuery = latestUserMessage && latestUserMessage.role === 'user' 
+                ? latestUserMessage.content 
+                : ""; // 如果找不到，則為空字串
+
+            // 🚩 【新增 RAG 邏輯】檢索相關資料
+            const retrievedData = retrieveRelevantData(externalData, userQuery, finalPromptMode);
+            const retrievedmaterialData = retrieveRelevantData(externalmaterialData, userQuery, finalPromptMode);
+            
+            // 3. 伺服器端建構 systemPrompt
+            // 【修改：傳入檢索後的資料】
+            const systemPromptContent = buildSystemPrompt(retrievedData, retrievedmaterialData, finalPromptMode);
             
             // 4. 建構最終要傳給 OpenRouter 的 messages 陣列
             const finalMessages = [
