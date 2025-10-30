@@ -253,10 +253,11 @@ B
 	if (promptMode === "PARENT") {
         // 模式 1: 家長模式 (前台工作人員)
         selectedPromptTemplate = PARENT_PROMPT_TEMPLATE;
+		console.log(retrievedmaterialData);
     } else {
 		// 模式 2: 學生模式 (老師) - 作為預設模式
 		selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE; 
-		console.log(STUDENT_PROMPT_TEMPLATE);
+		console.log(retrievedmaterialData);
     }
 	
     return selectedPromptTemplate;
@@ -355,4 +356,3 @@ export default {
         }
     },
 };
-
