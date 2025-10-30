@@ -256,7 +256,7 @@ B
     } else {
 		// 模式 2: 學生模式 (老師) - 作為預設模式
 		selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE; 
-		console.log(selectedPromptTemplate);
+		console.log(STUDENT_PROMPT_TEMPLATE);
     }
 	
     return selectedPromptTemplate;
@@ -355,3 +355,4 @@ export default {
         }
     },
 };
+
