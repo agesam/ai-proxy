@@ -122,9 +122,28 @@ function retrieveRelevantData(knowledgeBase, userQuery, promptMode) {
     }
 
     // 1. 提取用於比對的關鍵詞
-    // 在簡單的 RAG 實現中，我們直接使用提問的詞語作為關鍵詞。
-    // 在更進階的實現中，可以使用 NLP/分詞技術。
-    const keywords = userQuery.toLowerCase().split(/\s+/).filter(word => word.length > 1);
+    
+    // 【✅ 優化開始：針對中文分詞問題】
+    // 移除所有空格並轉換為小寫（雖然中文一般沒有小寫需求，但保留以防萬一）
+    const cleanedQuery = userQuery.replace(/\s/g, '').toLowerCase(); 
+    
+    // 將每個字元作為一個潛在的關鍵詞（單字檢索）
+    // 這是一個比空格分割更適合中文的簡單方法。
+    let keywords = Array.from(cleanedQuery).filter(word => word.length > 0); 
+    
+    // 【可選進階優化】：同時加入雙字詞組（二元文法 n-gram）
+    // 提高檢索的準確性：例如「小丑魚」會被分割成「小」、「丑」、「魚」，以及「小丑」、「丑魚」
+    const N = 2; // 雙字詞組
+    for (let i = 0; i <= cleanedQuery.length - N; i++) {
+        keywords.push(cleanedQuery.substring(i, i + N));
+    }
+    
+    // 移除重複的關鍵詞
+    keywords = [...new Set(keywords)];
+    // 【✅ 優化結束】
+    
+    // ⚠️ 原始程式碼的邏輯可以刪除
+    // const keywords = userQuery.toLowerCase().split(/\s+/).filter(word => word.length > 1); 
 
     // 如果沒有提取到關鍵詞，則返回空
     if (keywords.length === 0) {
@@ -138,8 +157,11 @@ function retrieveRelevantData(knowledgeBase, userQuery, promptMode) {
 
         for (const keyword of keywords) {
             // 計算關鍵字在資料中出現的次數
+            // 這裡使用 'g' (全局) 旗標來計算出現的次數
             const occurrences = (content.match(new RegExp(keyword, 'g')) || []).length;
-            score += occurrences;
+            
+            // 賦予較長的關鍵詞（例如雙字詞）更高的權重，以提高準確性
+            score += occurrences * (keyword.length === 1 ? 1 : 2); // 單字權重 1，雙字權重 2
         }
 
         return { item, score };
