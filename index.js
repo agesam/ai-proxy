@@ -215,7 +215,7 @@ function buildSystemPrompt(externalData, retrievedmaterialData, promptMode) {
 **【重要提醒：生成單選題流程】你【必須】先輸出主要內容，然後再輸出格式化的單選題。**
 **這段內容必須獨立存在，不能被任何標籤包裹。**
 **【輸出結構強制規範：絕對不可變動】**
-在成功輸出【主要知識或資訊】後，你**必須**根據該知識提出一個單選題（不多於4個選項），用以引導使用者進一步探索相關主題。
+在成功輸出【主要知識或資訊】後，你**必須**根據該知識提出一個繁體中文的單選題（不多於4個選項），用以引導使用者進一步探索相關主題。
 **你的提問【絕對不可以】是開放式問題。**
 
 **【🚨格式強制規範：絕對不可變動🚨】**
@@ -256,6 +256,7 @@ B
     } else {
 		// 模式 2: 學生模式 (老師) - 作為預設模式
 		selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE; 
+		console.log(selectedPromptTemplate);
     }
 	
     return selectedPromptTemplate;
@@ -354,4 +355,3 @@ export default {
         }
     },
 };
-
