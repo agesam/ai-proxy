@@ -219,108 +219,84 @@ B
 }
 
 export default {
-    async fetch(request) {
-        const apiKey = Deno.env.get("OPENROUTER_API_KEY");
-        if (!apiKey) {
-            return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
-        }
+    async fetch(request) {
+        const apiKey = Deno.env.get("OPENROUTER_API_KEY");
+        if (!apiKey) {
+            return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
+        }
 
-        if (request.method === 'OPTIONS') {
-            return new Response(null, {
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-                },
-            });
-        }
+        if (request.method === 'OPTIONS') {
+            return new Response(null, {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+                },
+            });
+        }
 
-        if (request.method !== 'POST') {
-            return new Response('NOTHING HERE', { status: 405 });
-        }
+        if (request.method !== 'POST') {
+            return new Response('NOTHING HERE', { status: 405 });
+        }
 
-        try {
-            // 1. 接收前端傳來的簡化資料
-            // 注意：conversation_history 必須包含前端構建的多模態訊息結構
-            const { promptMode, conversation_history, model, temperature, max_tokens, stream, top_p} = await request.json();
-            
-            // 2. 伺服器端載入外部資料 (保持不變)
-            const externalData = await loadExternalData();
-            const externalmaterialData = await loadExternalmaterialData();
+        try {
+            // 1. 接收前端傳來的簡化資料
+            const { promptMode, conversation_history, model, temperature, max_tokens, stream, top_p} = await request.json();
+            
+            // 2. 伺服器端載入外部資料
+            const externalData = await loadExternalData();
+            const externalmaterialData = await loadExternalmaterialData();
 			const finalPromptMode = promptMode || "PARENT";
 
-            // 3. 伺服器端建構 systemPrompt (保持不變)
-            const systemPromptContent = buildSystemPrompt(externalData, externalmaterialData, finalPromptMode);
-            
-            // 4. 建構最終要傳給 OpenRouter 的 messages 陣列 (保持不變)
-            const finalMessages = [
-                { role: "system", content: systemPromptContent },
-                ...conversation_history // 將歷史訊息展開
-            ];
+            // 3. 伺服器端建構 systemPrompt
+            const systemPromptContent = buildSystemPrompt(externalData, externalmaterialData, finalPromptMode);
+            
+            // 4. 建構最終要傳給 OpenRouter 的 messages 陣列
+            const finalMessages = [
+                { role: "system", content: systemPromptContent },
+                ...conversation_history // 將歷史訊息展開
+            ];
 
-            // 【重點修改 A：檢查是否為多模態請求並決定最終模型】
-            let finalModel = model || "openai/gpt-oss-20b:free"; // 預設模型
+            // 5. 建構 OpenRouter 的完整請求體 (payload)
+            const openrouterRequestPayload = {
+                // 使用前端傳來的 model 名稱，若無則使用預設
+                model: model || "openai/gpt-oss-20b:free", 
+                messages: finalMessages,
+                // temperature 預設 0.3 低預設溫度以減少幻覺
+                temperature: temperature || 0.3, 
+                // top_p 預設 0.9，平衡多樣性與準確性
+                top_p: top_p || 0.9,             
+                max_tokens: max_tokens || 4096,
+                stream: stream !== undefined ? stream : true,
+            };
+            
+            const openrouterUrl = 'https://openrouter.ai/api/v1/chat/completions';
 
-            // 檢查 conversation_history 中最新的使用者訊息 (最後一個元素) 是否包含圖片
-            const lastMessage = conversation_history.slice(-1)[0]; 
+            const newRequest = new Request(openrouterUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify(openrouterRequestPayload), // 傳送伺服器建構的 payload
+            });
 
-            // 只有在最後一則訊息存在且 role 為 'user' 時才進行檢查
-            if (lastMessage && lastMessage.role === 'user') {
-                // 檢查 content 是否為陣列 (多模態訊息) 並且包含 image_url 類型
-                // 前端在傳輸圖片時，user 訊息的 content 是一個陣列，其中包含 {type: "image_url", ...}
-                const isMultimodal = Array.isArray(lastMessage.content) && lastMessage.content.some(item => item.type === 'image_url');
-                
-                if (isMultimodal) {
-                    // 如果有圖片，強制切換到支援視覺的模型
-                    // **重要：請將此替換為您 OpenRouter 帳號可用的視覺模型。**
-                    // 推薦使用：google/gemini-2.5-flash 或 openai/gpt-4-vision-preview
-                    finalModel = "meta-llama/llama-4-scout:free"; 
-                    console.log("Deno 後台偵測到圖片輸入，切換模型至:", finalModel);
-                }
-            }
-            // 【重點修改 A 結束】
+            const response = await fetch(newRequest);
 
+            const newHeaders = new Headers(response.headers);
+            newHeaders.set('Access-Control-Allow-Origin', '*');
+            newHeaders.set('Access-Control-Allow-Methods', 'POST');
+            newHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-            // 5. 建構 OpenRouter 的完整請求體 (payload)
-            const openrouterRequestPayload = {
-                // 【重點修改 B：使用動態決定的 finalModel】
-                model: finalModel, 
-                messages: finalMessages,
-                // temperature 預設 0.3 低預設溫度以減少幻覺
-                temperature: temperature || 0.3, 
-                // top_p 預設 0.9，平衡多樣性與準確性
-                top_p: top_p || 0.9,             
-                max_tokens: max_tokens || 4096,
-                stream: stream !== undefined ? stream : true,
-            };
-            
-            const openrouterUrl = 'https://openrouter.ai/api/v1/chat/completions';
+            return new Response(response.body, {
+                status: response.status,
+                statusText: response.statusText,
+                headers: newHeaders,
+            });
 
-            const newRequest = new Request(openrouterUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify(openrouterRequestPayload), // 傳送伺服器建構的 payload
-            });
-
-            const response = await fetch(newRequest);
-
-            const newHeaders = new Headers(response.headers);
-            newHeaders.set('Access-Control-Allow-Origin', '*');
-            newHeaders.set('Access-Control-Allow-Methods', 'POST');
-            newHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-            return new Response(response.body, {
-                status: response.status,
-                statusText: response.statusText,
-                headers: newHeaders,
-            });
-
-        } catch (e) {
-            // 捕捉載入資料和請求 API 的錯誤，並返回給前端
-            return new Response(`Error: ${e.message}`, { status: 500 });
-        }
-    },
+        } catch (e) {
+            // 捕捉載入資料和請求 API 的錯誤，並返回給前端
+            return new Response(`Error: ${e.message}`, { status: 500 });
+        }
+    },
 };
