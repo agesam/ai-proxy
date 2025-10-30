@@ -149,7 +149,7 @@ function retrieveRelevantData(knowledgeBase, userQuery, promptMode) {
     scoredData.sort((a, b) => b.score - a.score);
 
     // 限制檢索結果的數量 (例如 5 條)
-    const topN = 5; 
+    const topN = 10; 
     
     // 返回精簡後的資料項目陣列
     return scoredData.slice(0, topN).map(data => data.item);
@@ -284,7 +284,7 @@ export default {
 
         try {
             // 1. 接收前端傳來的簡化資料
-            const { GameMode, promptMode, conversation_history, model, temperature, max_tokens, stream, top_p} = await request.json();
+            const { promptMode, conversation_history, model, temperature, max_tokens, stream, top_p} = await request.json();
             
             // 2. 伺服器端載入完整的外部資料 (這裡會用到快取)
             const externalData = await loadExternalData();
@@ -354,3 +354,4 @@ export default {
         }
     },
 };
+
