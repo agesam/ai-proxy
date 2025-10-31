@@ -13,6 +13,26 @@ console.log("Deno 應用程式啟動，開始主動預載知識庫...");
 loadExternalSchoolData().catch(e => console.error("預載早慧資料失敗:", e));
 loadExternalmaterialData().catch(e => console.error("預載動畫教材資料失敗:", e));
 
+// 🔑 Firebase 初始化
+const firebaseConfig = {
+	apiKey: "AIzaSyDIPfZNwNHTK6Mbs9-j9ZHg5aJqL1sII-4",
+	authDomain: "ailog-c0a47.firebaseapp.com",
+	projectId: "ailog-c0a47",
+	storageBucket: "ailog-c0a47.firebasestorage.app",
+	messagingSenderId: "561004984761",
+	appId: "1:561004984761:web:46c9398ac5eff00d5a9e68",
+	measurementId: "G-LZTR9JPNWS"
+};
+
+// API配置
+const API_CONFIG = {
+	// 主力Model 	
+	primarymodel: "meta-llama/llama-4-scout:free",	
+	// 後備Model
+	secondarymodel: "openai/gpt-oss-20b:free",	
+	tertiarymodel:	"nousresearch/deephermes-3-llama-3-8b-preview:free",			
+};
+
 // 【整合快取邏輯】
 async function loadExternalSchoolData() {
     // 檢查快取是否有效 (未過期且資料存在)
