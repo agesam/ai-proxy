@@ -10,11 +10,11 @@ let dataCache = {
 const CACHE_TTL_MS = 60 * 60 * 1000;
 
 console.log("Deno 應用程式啟動，開始主動預載知識庫...");
-loadExternalData().catch(e => console.error("預載早慧資料失敗:", e));
+loadExternalSchoolData().catch(e => console.error("預載早慧資料失敗:", e));
 loadExternalmaterialData().catch(e => console.error("預載動畫教材資料失敗:", e));
 
 // 【整合快取邏輯】
-async function loadExternalData() {
+async function loadExternalSchoolData() {
     // 檢查快取是否有效 (未過期且資料存在)
     const cacheEntry = dataCache.早慧資料;
     const now = Date.now();
@@ -138,9 +138,6 @@ function buildSystemPrompt(externalData, externalmaterialData, promptMode) {
 	當主題不可討論或提供時，你必須先回覆「🙇‍♂️✨ 很抱歉，現在小博士唔太清楚以上內容，可能無法回答你的問題。
 	不如你再試下問其他早慧兒童教育中心的資訊。⏳🙏」，之後再引導使用者返回到JSON數據知識庫內的話題。
 
-**注意** 
-【生成內容的字元絕對不可以超過4000字元】
-
 以下是你的知識庫（JSON 格式）：
 早慧資料：\n${JSON.stringify(externalData)};
 動畫教材資料：\n${JSON.stringify(externalmaterialData)};
@@ -220,7 +217,7 @@ B
 
 export default {
     async fetch(request) {
-        const apiKey = Deno.env.get("OPENROUTER_API_KEY_BACKUP");
+        const apiKey = Deno.env.get("OPENROUTER_API_KEY");
         if (!apiKey) {
             return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
         }
@@ -244,7 +241,7 @@ export default {
             const { promptMode, conversation_history, model, temperature, max_tokens, stream, top_p} = await request.json();
             
             // 2. 伺服器端載入外部資料
-            const externalData = await loadExternalData();
+            const externalData = await loadExternalSchoolData();
             const externalmaterialData = await loadExternalmaterialData();
 			const finalPromptMode = promptMode || "PARENT";
 
@@ -300,4 +297,3 @@ export default {
         }
     },
 };
-
