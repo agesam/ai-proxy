@@ -141,7 +141,7 @@ function buildSystemPrompt(externalData, externalmaterialData, promptMode) {
 動畫教材資料：\n${JSON.stringify(externalmaterialData)};
 `;
 
-		// 🚩【問題模板】
+	// 🚩【問題模板】
 	const QUESTION_TEMPLATE =`
 **[第二階段：單選題（條件性）]**
 **【重要提醒：生成單選題流程】你【必須】先輸出主要內容，然後再輸出格式化的單選題。**
@@ -160,9 +160,7 @@ function buildSystemPrompt(externalData, externalmaterialData, promptMode) {
 請確保所有標籤 ( [Question]、[Options]、[CorrectAnswer]、[WrongAnswer]、[NextTopic] ) 都【獨立佔一行】且【不包含任何額外字符】。
 
 \n[Question]
-**【指令重點：】**
-不可以是開放式問題
-內容：與知識的相關問題
+請問……，以下邊一個是正確答案？
 
 [Options]
 A. 答案
@@ -357,4 +355,5 @@ export default {
         }
     },
 };
+
 
