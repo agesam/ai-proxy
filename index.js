@@ -239,8 +239,18 @@ export default {
 
         try {
             // 1. 接收前端傳來的簡化資料
-            const { promptMode, conversation_history, model, temperature, max_tokens, stream, top_p} = await request.json();
-            
+            const { 
+                promptMode, 
+                conversation_history, 
+                model, 
+                temperature, 
+                max_tokens, 
+                stream, 
+                top_p,
+                prompt,
+                image_base64 
+            } = await request.json();
+			
             // 2. 伺服器端載入外部資料
             const externalData = await loadExternalSchoolData();
             const externalmaterialData = await loadExternalmaterialData();
@@ -249,11 +259,60 @@ export default {
             // 3. 伺服器端建構 systemPrompt
             const systemPromptContent = buildSystemPrompt(externalData, externalmaterialData, finalPromptMode);
             
+			// 輔助函數：將前端格式 (包含 {message, image} 物件) 轉換為 OpenRouter 格式
+            const normalizeMessageForOpenRouter = (msg) => {
+                // 檢查是否為用戶訊息且包含前端儲存的圖片結構
+                if (msg.role === 'user' && typeof msg.content === 'object' && msg.content.image) {
+                    // content 欄位需要被轉換為 [text object, image object] 陣列
+                    const contentArray = [];
+                    const historyImageBase64 = msg.content.image.split(',')[1]; // 移除 Data URL 前綴
+                    
+                    // 1. 新增圖片 (Llama/OpenRouter 圖片要求 Data URL 格式)
+                    contentArray.push({ 
+                        type: "image_url", 
+                        image_url: { url: `data:image/jpeg;base64,${historyImageBase64}` } 
+                    });
+                    
+                    // 2. 新增文字 (即使為空)
+                    contentArray.push({ type: "text", text: msg.content.message || "" });
+                    
+                    return {
+                        role: "user",
+                        content: contentArray
+                    };
+                }
+                
+                // 處理其他標準訊息 (Bot 回覆 或 舊式純文字 User 訊息)
+                return { 
+                    role: msg.role, 
+                    // 確保只傳遞文字內容，如果是前端的結構化物件，則提取 .message
+                    content: typeof msg.content === 'object' ? msg.content.message : msg.content
+                };
+            };
+			
             // 4. 建構最終要傳給 OpenRouter 的 messages 陣列
             const finalMessages = [
                 { role: "system", content: systemPromptContent },
-                ...conversation_history // 將歷史訊息展開
+                ...conversation_history.map(normalizeMessageForOpenRouter) // 將歷史訊息展開
             ];
+
+			// 處理當前用戶訊息 (Prompt + Image_Base64)
+            let currentUserMessage = { role: "user" };
+            
+            if (image_base64) {
+                // 多模態訊息： content 必須是陣列
+                currentUserMessage.content = [
+                    // 圖片數據需要重新加上 Data URL 前綴
+                    { type: "image_url", image_url: { url: `data:image/jpeg;base64,${image_base64}` } },
+                    { type: "text", text: prompt || "" } // 包含當前文字 Prompt
+                ];
+            } else {
+                // 純文字訊息： content 為字串
+                currentUserMessage.content = prompt;
+            }
+
+            // 將當前訊息加入最終訊息陣列
+            finalMessages.push(currentUserMessage);
 
             // 5. 建構 OpenRouter 的完整請求體 (payload)
             const openrouterRequestPayload = {
@@ -298,4 +357,3 @@ export default {
         }
     },
 };
-
