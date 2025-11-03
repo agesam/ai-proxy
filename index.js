@@ -265,12 +265,12 @@ export default {
                 if (msg.role === 'user' && typeof msg.content === 'object' && msg.content.image) {
                     // content 欄位需要被轉換為 [text object, image object] 陣列
                     const contentArray = [];
-                    const historyImageBase64 = msg.content.image.split(',')[1]; // 移除 Data URL 前綴
+					const historyImageFullUrl = msg.content.image;
                     
                     // 1. 新增圖片 (Llama/OpenRouter 圖片要求 Data URL 格式)
                     contentArray.push({ 
                         type: "image_url", 
-                        image_url: { url: `data:image/jpeg;base64,${historyImageBase64}` } 
+                        image_url: { url: historyImageFullUrl }
                     });
                     
                     // 2. 新增文字 (即使為空)
@@ -303,8 +303,8 @@ export default {
                 // 多模態訊息： content 必須是陣列
                 currentUserMessage.content = [
                     // 圖片數據需要重新加上 Data URL 前綴
-                    { type: "image_url", image_url: { url: `data:image/jpeg;base64,${image_base64}` } },
-                    { type: "text", text: prompt || "" } // 包含當前文字 Prompt
+                    { type: "image_url", image_url: { url: image_base64 } },
+					{ type: "text", text: prompt || "" }
                 ];
             } else {
                 // 純文字訊息： content 為字串
