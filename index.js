@@ -210,10 +210,12 @@ B
     } else {
 		// 模式 2: 學生模式 (老師) 
 		if (GameMode)
-			selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE;
-		else
 			selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE + QUESTION_TEMPLATE;
-    }	
+		else
+			selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE;
+    }
+	console.log("判斷模式:", promptMode ,"問答題:", GameMode);
+	
     return selectedPromptTemplate;
 }
 
@@ -360,6 +362,7 @@ export default {
         }
     },
 };
+
 
 
 
