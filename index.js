@@ -221,10 +221,13 @@ B
 
 export default {
     async fetch(request) {
-        const apiKey = Deno.env.get("OPENROUTER_API_KEY");
-        if (!apiKey) {
-            return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
-        }
+        // 1. 同時取得主要和備用金鑰
+        const primaryApiKey = Deno.env.get("OPENROUTER_API_KEY");
+        const backupApiKey = Deno.env.get("OPENROUTER_API_KEY_BACKUP");
+
+        if (!primaryApiKey) {
+            return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
+        }
 
         if (request.method === 'OPTIONS') {
             return new Response(null, {
@@ -334,37 +337,82 @@ export default {
             
             const openrouterUrl = 'https://openrouter.ai/api/v1/chat/completions';
 
-            const newRequest = new Request(openrouterUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify(openrouterRequestPayload), // 傳送伺服器建構的 payload
-            });
+            // 2. 獨立的請求函數，方便重試
+            const callOpenRouter = async (apiKey) => {
+                const newRequest = new Request(openrouterUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}` // 使用傳入的 Key
+                    },
+                    body: JSON.stringify(openrouterRequestPayload),
+                });
+                return fetch(newRequest);
+            };
 
-            const response = await fetch(newRequest);
+            let response;
+            let currentApiKey = primaryApiKey;
+            let usedBackup = false;
 
-            const newHeaders = new Headers(response.headers);
-            newHeaders.set('Access-Control-Allow-Origin', '*');
-            newHeaders.set('Access-Control-Allow-Methods', 'POST');
-            newHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+            // 3. 嘗試使用主要金鑰
+            try {
+                console.log("嘗試使用主要金鑰...");
+                response = await callOpenRouter(primaryApiKey);
 
-            return new Response(response.body, {
-                status: response.status,
-                statusText: response.statusText,
-                headers: newHeaders,
-            });
+                // 檢查是否是限流錯誤 (HTTP 429 Too Many Requests)
+                if (response.status === 429 && backupApiKey) {
+                    console.error("主要金鑰觸發限流 (429)。嘗試使用備用金鑰...");
+                    // 丟棄第一個 response body，準備重試
+                    await response.text(); 
+                    
+                    // 嘗試使用備用金鑰
+                    response = await callOpenRouter(backupApiKey);
+                    currentApiKey = backupApiKey;
+                    usedBackup = true;
+                } else if (!response.ok) {
+                    // 非 429 的其他 API 錯誤
+                    throw new Error(`OpenRouter API 錯誤: ${response.status} (${response.statusText})`);
+                }
+            } catch (error) {
+                // 處理網路錯誤或非 429 的錯誤拋出
+                if (!usedBackup && backupApiKey) {
+                     console.error(`主要金鑰請求失敗: ${error.message}。嘗試使用備用金鑰...`);
+                    // 嘗試使用備用金鑰
+                    response = await callOpenRouter(backupApiKey);
+                    currentApiKey = backupApiKey;
+                    usedBackup = true;
+                } else {
+                    // 如果備用金鑰也用過了，或沒有備用金鑰，則拋出
+                    throw error;
+                }
+            }
+            
+            if (!response) {
+                 throw new Error("API 請求沒有獲得有效回應。");
+            }
+            
+            if (!response.ok) {
+                 // 檢查最終的回應是否成功，如果失敗 (例如備用金鑰也限流或無效)
+                 throw new Error(`最終 OpenRouter API 錯誤: ${response.status} (${response.statusText})`);
+            }
 
-        } catch (e) {
-            // 捕捉載入資料和請求 API 的錯誤，並返回給前端
-            return new Response(`Error: ${e.message}`, { status: 500 });
-        }
-    },
+            console.log(`OpenRouter 請求成功，使用金鑰: ${usedBackup ? '備用' : '主要'}`);
+
+            // 4. 返回回應 (保持不變)
+            const newHeaders = new Headers(response.headers);
+            newHeaders.set('Access-Control-Allow-Origin', '*');
+            newHeaders.set('Access-Control-Allow-Methods', 'POST');
+            newHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+            return new Response(response.body, {
+                status: response.status,
+                statusText: response.statusText,
+                headers: newHeaders,
+            });
+
+        } catch (e) {
+            // 捕捉載入資料和請求 API 的錯誤，並返回給前端
+            return new Response(`Error: ${e.message}`, { status: 500 });
+        }
+    },
 };
-
-
-
-
-
-
