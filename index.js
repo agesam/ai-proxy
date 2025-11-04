@@ -113,7 +113,7 @@ async function loadExternalmaterialData() {
 }
 
 // 核心邏輯：生成 systemPrompt
-function buildSystemPrompt(externalData, externalmaterialData, promptMode) {
+function buildSystemPrompt(externalData, externalmaterialData, promptMode, GameMode) {
  	// 【模式選擇】
     let selectedPromptTemplate;
 
@@ -202,14 +202,17 @@ B
 1. 任何情況下都只使用繁體中文及廣東話，使用適合兒童理解的詞彙和表達方式。
 2. 使用適合兒童的老師語氣，保持回答有趣，可多用emoji及「」來標示出重點內容。
 3. 當遇到不懂的問題時，絕對不能虛構或猜測資訊，請誠實地說你正在學習並提出疑問，鼓勵使用者一起尋找答案。
-` + COMMON_RULES_AND_SAFETY + QUESTION_TEMPLATE;
+` + COMMON_RULES_AND_SAFETY;
 			
 	if (promptMode === "PARENT") {
         // 模式 1: 家長模式 (前台工作人員)
         selectedPromptTemplate = PARENT_PROMPT_TEMPLATE;
     } else {
 		// 模式 2: 學生模式 (老師) 
-		selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE; 
+		if (GameMode)
+			selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE
+		else
+			selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE + QUESTION_TEMPLATE;; 
     }	
     return selectedPromptTemplate;
 }
@@ -246,16 +249,18 @@ export default {
                 stream, 
                 top_p,
                 prompt,
-                image_base64 
+                image_base64,
+				GameMode
             } = await request.json();
 			
             // 2. 伺服器端載入外部資料
             const externalData = await loadExternalSchoolData();
             const externalmaterialData = await loadExternalmaterialData();
 			const finalPromptMode = promptMode || "PARENT";
+			const finalGameMode = GameMode || false;
 
             // 3. 伺服器端建構 systemPrompt
-            const systemPromptContent = buildSystemPrompt(externalData, externalmaterialData, finalPromptMode);
+            const systemPromptContent = buildSystemPrompt(externalData, externalmaterialData, finalPromptMode, finalGameMode);
             
 			// 輔助函數：將前端格式 (包含 {message, image} 物件) 轉換為 OpenRouter 格式
             const normalizeMessageForOpenRouter = (msg) => {
@@ -355,5 +360,6 @@ export default {
         }
     },
 };
+
 
 
