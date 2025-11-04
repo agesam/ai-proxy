@@ -210,9 +210,9 @@ B
     } else {
 		// 模式 2: 學生模式 (老師) 
 		if (GameMode)
-			selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE
+			selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE;
 		else
-			selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE + QUESTION_TEMPLATE;; 
+			selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE + QUESTION_TEMPLATE;
     }	
     return selectedPromptTemplate;
 }
@@ -360,6 +360,7 @@ export default {
         }
     },
 };
+
 
 
 
