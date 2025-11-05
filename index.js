@@ -122,11 +122,11 @@ function buildSystemPrompt(externalData, externalmaterialData, promptMode, GameM
 4. 嚴格遵守JSON數據知識庫【早慧資料】及【動畫教材資料】的資料內容，不編造、不猜測，只提供事實的信息。
 5. 嚴格遵守優先使用JSON數據知識庫的內容來回答問題，但當對話與JSON數據知識庫無關係時，可以使用通用知識回答。
 6. 當使用任何非JSON數據知識庫(如通用知識，互聯網資訊)內的資訊回答時，回答中必須清楚註明【雖然我不太清楚，但是有可能是...】後再提供資訊。    
-7. 回答中可多用【Markdown語法】，令到排版更加美觀，使用者更加清晰易懂。
-8. 當對話中的主題與JSON數據知識庫的【圖庫】中的關鍵字有關聯，可以在對話最後附上資料庫中使用【Markdown語法】或【HTML語法】的相應【圖片連結】。
+7. 當對話中的主題與JSON數據知識庫的【圖庫】中的關鍵字有關聯，可以在對話最後附上資料庫中使用【Markdown語法】或【HTML語法】的相應【圖片連結】。
     範例：
     <img>https://artgardenofeden.com.hk/image/clownfish001.webp</img> <-- 正確
     ![小丑魚](https://artgardenofeden.com.hk/image/clownfish001.webp) <-- 正確
+8. 回答中使用的圖片只可以在JSON數據知識庫包括在內的，絕對不可以編造猜測不存在的連結或使用網路上來路不明的圖片。
 9. 當回答涉及任何結構化數據時，請使用【Markdown語法】或【HTML語法】建構出表格。
 10. 嚴禁討論或提供任何與以下主題相關的內容：
 	【人身安全/暴力】(自殺、自殘、任何形式的暴力、非法活動、危險挑戰、毒品、槍械)；
@@ -426,3 +426,4 @@ export default {
         }
     },
 };
+
