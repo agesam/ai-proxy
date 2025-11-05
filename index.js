@@ -263,13 +263,15 @@ export default {
             const externalmaterialData = await loadExternalmaterialData();
 			const finalPromptMode = promptMode || "PARENT";
 			const finalGameMode = GameMode || false;
-			const finalmodel = model || "primarymodel";
+			const finalmodel = "";
 
-			if(finalmodel == "primarymodel"){
+			if (model === "primary"){
 				finalmodel = "meta-llama/llama-4-maverick:free"; 
-			} else if (finalmodel == "secondarymodel") {
+			} 
+			if (model === "secondary") {
 				finalmodel = "meta-llama/llama-4-scout:free";
-			}  else {
+			}  
+			if (model === "tertiary") {
 				finalmodel = "openai/gpt-oss-20b:free";
 			}
 			console.log("Model:", finalmodel);
@@ -426,3 +428,4 @@ export default {
         }
     },
 };
+
