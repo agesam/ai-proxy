@@ -1,3 +1,4 @@
+
 // index_DENO用.js (Deno Deploy 伺服器端程式碼)
 
 // 快取物件結構: { data: <資料陣列>, timestamp: <快取建立時間戳> }
@@ -26,20 +27,20 @@ async function loadExternalSchoolData() {
     }
 
     // 快取失效或不存在，執行外部載入
-    const apiURL = "https://script.google.com/macros/s/AKfycbw1D1AKlVr_iaArk-JkxN0YZ-NjyyxMgH-h-CatrFrprJXaSSxSsc2YZROaBxapPTEZeg/exec"; 
-    try {
-        const response = await fetch(apiURL);
-        if (!response.ok) {
-            // 拋出 HTTP 錯誤
-            throw new Error(`HTTP error! 狀態碼: ${response.status} (${response.statusText})`);
-        } 
-        const allSheetsData = await response.json(); 	
-        let combinedData = [];
-        for (const sheetName in allSheetsData) {
-            if (Object.prototype.hasOwnProperty.call(allSheetsData, sheetName)) {
-                combinedData = combinedData.concat(allSheetsData[sheetName]);
-            }
-        }                
+    const apiURL = "https://script.google.com/macros/s/AKfycbw1D1AKlVr_iaArk-JkxN0YZ-NjyyxMgH-h-CatrFrprJXaSSxSsc2YZROaBxapPTEZeg/exec"; 
+    try {
+        const response = await fetch(apiURL);
+        if (!response.ok) {
+            // 拋出 HTTP 錯誤
+            throw new Error(`HTTP error! 狀態碼: ${response.status} (${response.statusText})`);
+        } 
+        const allSheetsData = await response.json(); 	
+        let combinedData = [];
+        for (const sheetName in allSheetsData) {
+            if (Object.prototype.hasOwnProperty.call(allSheetsData, sheetName)) {
+                combinedData = combinedData.concat(allSheetsData[sheetName]);
+            }
+        }                
 
         // 【新增：更新快取】
         dataCache.早慧資料 = {
@@ -48,18 +49,18 @@ async function loadExternalSchoolData() {
         };
         console.log('成功載入並更新早慧資料快取。');
 
-        return combinedData;
-    } catch (error) {
-        console.error('伺服器載入外部知識庫時發生錯誤:', error);
-        // 如果載入失敗，我們檢查是否有舊的快取可以作為備用 (Graceful Degradation)
+        return combinedData;
+    } catch (error) {
+        console.error('伺服器載入外部知識庫時發生錯誤:', error);
+        // 如果載入失敗，我們檢查是否有舊的快取可以作為備用 (Graceful Degradation)
         if (cacheEntry && cacheEntry.data) {
             console.error('載入失敗，但返回舊的早慧資料快取作為備用。');
             return cacheEntry.data;
         }
 
-        // 如果載入失敗且沒有備用快取，則拋出錯誤
-        throw new Error('伺服器無法載入外部知識庫。');
-    }
+        // 如果載入失敗且沒有備用快取，則拋出錯誤
+        throw new Error('伺服器無法載入外部知識庫。');
+    }
 }
 
 // 【整合快取邏輯】
@@ -75,20 +76,20 @@ async function loadExternalmaterialData() {
     }
 
     // 快取失效或不存在，執行外部載入
-    const apiURL = "https://script.google.com/macros/s/AKfycbwCZLvFcqYvPFrBZJIrml5XdLsq3VNGCP9SK2DJfphYY53w5mGA2vdoa2v7EcasqIUJ/exec"; 
-    try {
-        const response = await fetch(apiURL);
-        if (!response.ok) {
-            // 拋出 HTTP 錯誤
-            throw new Error(`HTTP error! 狀態碼: ${response.status} (${response.statusText})`);
-        } 
-        const allSheetsData = await response.json(); 	
-        let combinedData = [];
-        for (const sheetName in allSheetsData) {
-            if (Object.prototype.hasOwnProperty.call(allSheetsData, sheetName)) {
-                combinedData = combinedData.concat(allSheetsData[sheetName]);
-            }
-        }                
+    const apiURL = "https://script.google.com/macros/s/AKfycbwCZLvFcqYvPFrBZJIrml5XdLsq3VNGCP9SK2DJfphYY53w5mGA2vdoa2v7EcasqIUJ/exec"; 
+    try {
+        const response = await fetch(apiURL);
+        if (!response.ok) {
+            // 拋出 HTTP 錯誤
+            throw new Error(`HTTP error! 狀態碼: ${response.status} (${response.statusText})`);
+        } 
+        const allSheetsData = await response.json(); 	
+        let combinedData = [];
+        for (const sheetName in allSheetsData) {
+            if (Object.prototype.hasOwnProperty.call(allSheetsData, sheetName)) {
+                combinedData = combinedData.concat(allSheetsData[sheetName]);
+            }
+        }                
 
         // 【新增：更新快取】
         dataCache.動畫教材資料 = {
@@ -97,9 +98,9 @@ async function loadExternalmaterialData() {
         };
         console.log('成功載入並更新動畫教材資料快取。');
 
-        return combinedData;
-    } catch (error) {
-        console.error('伺服器載入外部知識庫時發生錯誤:', error);
+        return combinedData;
+    } catch (error) {
+        console.error('伺服器載入外部知識庫時發生錯誤:', error);
 
         // 如果載入失敗，我們檢查是否有舊的快取可以作為備用 (Graceful Degradation)
         if (cacheEntry && cacheEntry.data) {
@@ -107,21 +108,21 @@ async function loadExternalmaterialData() {
             return cacheEntry.data;
         }
 
-        // 如果載入失敗且沒有備用快取，則拋出錯誤
-        throw new Error('伺服器無法載入外部知識庫。');
-    }
+        // 如果載入失敗且沒有備用快取，則拋出錯誤
+        throw new Error('伺服器無法載入外部知識庫。');
+    }
 }
 
 // 核心邏輯：生成 systemPrompt
 function buildSystemPrompt(externalData, externalmaterialData, promptMode, GameMode) {
- 	// 【模式選擇】
+ 	// 【模式選擇】
     let selectedPromptTemplate;
 
 	// 🚩 基本共用的指令
 	const COMMON_RULES_AND_SAFETY = `
 4. 嚴格遵守JSON數據知識庫【早慧資料】及【動畫教材資料】的資料內容，不編造、不猜測，只提供事實的信息。
 5. 嚴格遵守優先使用JSON數據知識庫的內容來回答問題，但當對話與JSON數據知識庫無關係時，可以使用通用知識回答。
-6. 當使用任何非JSON數據知識庫(如通用知識，互聯網資訊)內的資訊回答時，回答中必須清楚註明【雖然我不太清楚，但是有可能是...】後再提供資訊。    
+6. 當使用任何非JSON數據知識庫(如通用知識，互聯網資訊)內的資訊回答時，回答中必須清楚註明【雖然我不太清楚，但是有可能是...】後再提供資訊。    
 7. 回答中可多用【Markdown語法】，令到排版更加美觀，使用者更加清晰易懂。
 8. 當對話中的主題與JSON數據知識庫的【圖庫】中的關鍵字有關聯，可以在對話最後附上資料庫中使用【Markdown語法】或【HTML語法】的相應【圖片連結】。
     範例：
@@ -216,36 +217,33 @@ B
     }
 	console.log("判斷模式:", promptMode ,"問答題:", GameMode);
 	
-    return selectedPromptTemplate;
+    return selectedPromptTemplate;
 }
 
 export default {
-    async fetch(request) {
-        // 1. 同時取得主要和備用金鑰
-        const primaryApiKey = Deno.env.get("OPENROUTER_API_KEY");
-        const backupApiKey = Deno.env.get("OPENROUTER_API_KEY_BACKUP");
-
-        if (!primaryApiKey) {
+    async fetch(request) {
+        const apiKey = Deno.env.get("OPENROUTER_API_KEY");
+        if (!apiKey) {
             return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
         }
 
-        if (request.method === 'OPTIONS') {
-            return new Response(null, {
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-                },
-            });
-        }
+        if (request.method === 'OPTIONS') {
+            return new Response(null, {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+                },
+            });
+        }
 
-        if (request.method !== 'POST') {
-            return new Response('NOTHING HERE', { status: 405 });
-        }
+        if (request.method !== 'POST') {
+            return new Response('NOTHING HERE', { status: 405 });
+        }
 
-        try {
-            // 1. 接收前端傳來的簡化資料
-            const { 
+        try {
+            // 1. 接收前端傳來的簡化資料
+            const { 
                 promptMode, 
                 conversation_history, 
                 model, 
@@ -258,27 +256,15 @@ export default {
 				GameMode
             } = await request.json();
 			
-            // 2. 伺服器端載入外部資料
-            const externalData = await loadExternalSchoolData();
-            const externalmaterialData = await loadExternalmaterialData();
+            // 2. 伺服器端載入外部資料
+            const externalData = await loadExternalSchoolData();
+            const externalmaterialData = await loadExternalmaterialData();
 			const finalPromptMode = promptMode || "PARENT";
 			const finalGameMode = GameMode || false;
-			const finalmodel = "";
 
-			if (model === "primary"){
-				finalmodel = "meta-llama/llama-4-maverick:free"; 
-			} 
-			if (model === "secondary") {
-				finalmodel = "meta-llama/llama-4-scout:free";
-			}  
-			if (model === "tertiary") {
-				finalmodel = "openai/gpt-oss-20b:free";
-			}
-			console.log("Model:", finalmodel);
-
-            // 3. 伺服器端建構 systemPrompt
-            const systemPromptContent = buildSystemPrompt(externalData, externalmaterialData, finalPromptMode, finalGameMode);
-            
+            // 3. 伺服器端建構 systemPrompt
+            const systemPromptContent = buildSystemPrompt(externalData, externalmaterialData, finalPromptMode, finalGameMode);
+            
 			// 輔助函數：將前端格式 (包含 {message, image} 物件) 轉換為 OpenRouter 格式
             const normalizeMessageForOpenRouter = (msg) => {
                 // 檢查是否為用戶訊息且包含前端儲存的圖片結構
@@ -310,11 +296,11 @@ export default {
                 };
             };
 			
-            // 4. 建構最終要傳給 OpenRouter 的 messages 陣列
-            const finalMessages = [
-                { role: "system", content: systemPromptContent },
-                ...conversation_history.map(normalizeMessageForOpenRouter) // 將歷史訊息展開
-            ];
+            // 4. 建構最終要傳給 OpenRouter 的 messages 陣列
+            const finalMessages = [
+                { role: "system", content: systemPromptContent },
+                ...conversation_history.map(normalizeMessageForOpenRouter) // 將歷史訊息展開
+            ];
 
 			// 處理當前用戶訊息 (Prompt + Image_Base64)
             let currentUserMessage = { role: "user" };
@@ -333,84 +319,33 @@ export default {
 
             // 將當前訊息加入最終訊息陣列
             finalMessages.push(currentUserMessage);
-			
-            // 5. 建構 OpenRouter 的完整請求體 (payload)
-            const openrouterRequestPayload = {
-                // 使用前端傳來的 model 名稱，若無則使用預設
-                model: finalmodel || "openai/gpt-oss-20b:free", 
-                messages: finalMessages,
-                // temperature 預設 0.3 低預設溫度以減少幻覺
-                temperature: temperature || 0.3, 
-                // top_p 預設 0.9，平衡多樣性與準確性
-                top_p: top_p || 0.9,             
-                max_tokens: max_tokens || 4096,
-                stream: stream !== undefined ? stream : true,
-            };
-            
-            const openrouterUrl = 'https://openrouter.ai/api/v1/chat/completions';
 
-            // 2. 獨立的請求函數，方便重試
-            const callOpenRouter = async (apiKey) => {
-                const newRequest = new Request(openrouterUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}` // 使用傳入的 Key
-                    },
-                    body: JSON.stringify(openrouterRequestPayload),
-                });
-                return fetch(newRequest);
+            // 5. 建構 OpenRouter 的完整請求體 (payload)
+            const openrouterRequestPayload = {
+                // 使用前端傳來的 model 名稱，若無則使用預設
+                model: model || "openai/gpt-oss-20b:free", 
+                messages: finalMessages,
+                // temperature 預設 0.3 低預設溫度以減少幻覺
+                temperature: temperature || 0.3, 
+                // top_p 預設 0.9，平衡多樣性與準確性
+                top_p: top_p || 0.9,             
+                max_tokens: max_tokens || 4096,
+                stream: stream !== undefined ? stream : true,
             };
-
-            let response;
-            let currentApiKey = primaryApiKey;
-            let usedBackup = false;
-
-            // 3. 嘗試使用主要金鑰
-            try {
-                console.log("嘗試使用主要金鑰...");
-                response = await callOpenRouter(primaryApiKey);
-
-                // 檢查是否是限流錯誤 (HTTP 429 Too Many Requests)
-                if (response.status === 429 && backupApiKey) {
-                    console.error("主要金鑰觸發限流 (429)。嘗試使用備用金鑰...");
-                    // 丟棄第一個 response body，準備重試
-                    await response.text(); 
-                    
-                    // 嘗試使用備用金鑰
-                    response = await callOpenRouter(backupApiKey);
-                    currentApiKey = backupApiKey;
-                    usedBackup = true;
-                } else if (!response.ok) {
-                    // 非 429 的其他 API 錯誤
-                    throw new Error(`OpenRouter API 錯誤: ${response.status} (${response.statusText})`);
-                }
-            } catch (error) {
-                // 處理網路錯誤或非 429 的錯誤拋出
-                if (!usedBackup && backupApiKey) {
-                     console.error(`主要金鑰請求失敗: ${error.message}。嘗試使用備用金鑰...`);
-                    // 嘗試使用備用金鑰
-                    response = await callOpenRouter(backupApiKey);
-                    currentApiKey = backupApiKey;
-                    usedBackup = true;
-                } else {
-                    // 如果備用金鑰也用過了，或沒有備用金鑰，則拋出
-                    throw error;
-                }
-            }
             
-            if (!response) {
-                 throw new Error("API 請求沒有獲得有效回應。");
-            }
-            
-            if (!response.ok) {
-                 // 檢查最終的回應是否成功，如果失敗 (例如備用金鑰也限流或無效)
-                 throw new Error(`最終 OpenRouter API 錯誤: ${response.status} (${response.statusText})`);
-            }
+            const openrouterUrl = 'https://openrouter.ai/api/v1/chat/completions';
 
-            console.log(`OpenRouter 請求成功，使用金鑰: ${usedBackup ? '備用' : '主要'}`);
+            const newRequest = new Request(openrouterUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify(openrouterRequestPayload), // 傳送伺服器建構的 payload
+            });
 
-            // 4. 返回回應 (保持不變)
+            const response = await fetch(newRequest);
+
             const newHeaders = new Headers(response.headers);
             newHeaders.set('Access-Control-Allow-Origin', '*');
             newHeaders.set('Access-Control-Allow-Methods', 'POST');
@@ -428,4 +363,9 @@ export default {
         }
     },
 };
+
+
+
+
+
 
