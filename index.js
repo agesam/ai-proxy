@@ -263,6 +263,7 @@ export default {
             const externalmaterialData = await loadExternalmaterialData();
 			const finalPromptMode = promptMode || "PARENT";
 			const finalGameMode = GameMode || false;
+			const finalmodel = model || "primarymodel";
 
             // 3. 伺服器端建構 systemPrompt
             const systemPromptContent = buildSystemPrompt(externalData, externalmaterialData, finalPromptMode, finalGameMode);
@@ -321,11 +322,20 @@ export default {
 
             // 將當前訊息加入最終訊息陣列
             finalMessages.push(currentUserMessage);
+			
+			if(finalmodel == "primarymodel"){
+				finalmodel = "meta-llama/llama-4-maverick:free"; 
+			} else if (finalmodel == "secondarymodel") {
+				finalmodel = "meta-llama/llama-4-scout:free";
+			}  else {
+				finalmodel = "openai/gpt-oss-20b:free";
+			}
+			console.log("Model:", finalmodel);
 
             // 5. 建構 OpenRouter 的完整請求體 (payload)
             const openrouterRequestPayload = {
                 // 使用前端傳來的 model 名稱，若無則使用預設
-                model: model || "openai/gpt-oss-20b:free", 
+                model: finalmodel || "openai/gpt-oss-20b:free", 
                 messages: finalMessages,
                 // temperature 預設 0.3 低預設溫度以減少幻覺
                 temperature: temperature || 0.3, 
