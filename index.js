@@ -320,9 +320,9 @@ export default {
             // 將當前訊息加入最終訊息陣列
             finalMessages.push(currentUserMessage);
 			
-			if(model === "text"){
+			if(model === "primary"){
 				finalmodel = "meta-llama/llama-4-maverick:free"; 
-			} else if (model === "image") {
+			} else if (model === "secondary") {
 				finalmodel = "meta-llama/llama-4-scout:free";
 			}  else {
 				finalmodel = "openai/gpt-oss-20b:free";
@@ -423,5 +423,6 @@ export default {
         }
     },
 };
+
 
 
