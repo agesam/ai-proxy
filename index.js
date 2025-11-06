@@ -321,11 +321,11 @@ export default {
             finalMessages.push(currentUserMessage);
 			
 			if(model === "text"){
-				finalmodel = "openai/gpt-oss-20b:free"; 
+				finalmodel = "meta-llama/llama-4-maverick:free"; 
 			} else if (model === "image") {
 				finalmodel = "meta-llama/llama-4-scout:free";
 			}  else {
-				finalmodel = "meta-llama/llama-4-maverick:free";
+				finalmodel = "openai/gpt-oss-20b:free";
 			}
 			console.log("Model:", finalmodel);
 
@@ -423,7 +423,5 @@ export default {
         }
     },
 };
-
-
 
 
