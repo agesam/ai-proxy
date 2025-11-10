@@ -10,7 +10,7 @@ let dataCache = {
 const CACHE_TTL_MS = 60 * 60 * 1000;
 
 console.log("Deno 應用程式啟動，開始主動預載知識庫...");
-loadExternalSchoolData().catch(e => console.error("預載早慧資料失敗:", e));if (!response.ok) {
+loadExternalSchoolData().catch(e => console.error("預載早慧資料失敗:", e));
 loadExternalmaterialData().catch(e => console.error("預載動畫教材資料失敗:", e));
 
 // 【整合快取邏輯】
@@ -423,6 +423,7 @@ export default {
         }
     },
 };
+
 
 
 
