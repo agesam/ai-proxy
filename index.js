@@ -10,7 +10,7 @@ let dataCache = {
 const CACHE_TTL_MS = 60 * 60 * 1000;
 
 console.log("Deno 應用程式啟動，開始主動預載知識庫...");
-loadExternalSchoolData().catch(e => console.error("預載早慧資料失敗:", e));
+loadExternalSchoolData().catch(e => console.error("預載早慧資料失敗:", e));if (!response.ok) {
 loadExternalmaterialData().catch(e => console.error("預載動畫教材資料失敗:", e));
 
 // 【整合快取邏輯】
@@ -321,11 +321,11 @@ export default {
             finalMessages.push(currentUserMessage);
 			
 			if(model === "primary"){
-				finalmodel = "meta-llama/llama-4-maverick:free"; 
+				finalmodel = "openai/gpt-oss-20b:free"; 
 			} else if (model === "secondary") {
-				finalmodel = "meta-llama/llama-4-scout:free";
+				finalmodel = "meta-llama/llama-4-maverick:free";
 			}  else {
-				finalmodel = "openai/gpt-oss-20b:free";
+				finalmodel = "meta-llama/llama-4-scout:free";
 			}
 			console.log("Model:", finalmodel);
 
@@ -423,6 +423,7 @@ export default {
         }
     },
 };
+
 
 
 
