@@ -320,9 +320,9 @@ export default {
             finalMessages.push(currentUserMessage);
 			
 			if(model === "primary"){
-				finalmodel = "meta-llama/llama-4-maverick:free"; 
-			} else if (model === "secondary") {
 				finalmodel = "openai/gpt-oss-20b:free";
+			} else if (model === "secondary") {
+				finalmodel = "meta-llama/llama-4-maverick:free"; 
 			}  else {
 				finalmodel = "meta-llama/llama-4-scout:free";
 			}
@@ -422,6 +422,7 @@ export default {
         }
     },
 };
+
 
 
 
