@@ -321,13 +321,11 @@ export default {
             finalMessages.push(currentUserMessage);
 			
 			if(model === "primary"){
-				//finalmodel = "openai/gpt-oss-20b:free";
-				//finalmodel = "kwaipilot/kat-coder-pro:free";
 				finalmodel = "openrouter/sherlock-think-alpha";
 			} else if (model === "secondary") {
-				finalmodel = "meta-llama/llama-4-maverick:free"; 
+				finalmodel = "kwaipilot/kat-coder-pro:free";
 			}  else {
-				finalmodel = "meta-llama/llama-4-scout:free";
+				finalmodel = "meta-llama/llama-4-maverick:free";
 			}
 			console.log("Model:", finalmodel);
 
@@ -425,6 +423,7 @@ export default {
         }
     },
 };
+
 
 
 
