@@ -321,9 +321,9 @@ export default {
             finalMessages.push(currentUserMessage);
 			
 			if(model === "primary"){
-				finalmodel = "openrouter/sherlock-think-alpha";
-			} else if (model === "secondary") {
 				finalmodel = "kwaipilot/kat-coder-pro:free";
+			} else if (model === "secondary") {
+				finalmodel = "openrouter/sherlock-think-alpha";
 			}  else {
 				finalmodel = "meta-llama/llama-4-maverick:free";
 			}
@@ -423,6 +423,7 @@ export default {
         }
     },
 };
+
 
 
 
