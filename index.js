@@ -323,7 +323,7 @@ export default {
 			if(model === "primary"){
 				finalmodel = "kwaipilot/kat-coder-pro:free";
 			} else if (model === "secondary") {
-				finalmodel = "openrouter/sherlock-think-alpha";
+				finalmodel = "x-ai/grok-4.1-fast";
 			}  else {
 				finalmodel = "meta-llama/llama-4-maverick:free";
 			}
@@ -423,6 +423,7 @@ export default {
         }
     },
 };
+
 
 
 
