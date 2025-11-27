@@ -200,17 +200,36 @@ B
 2. 嚴格遵守使用適合兒童的老師語氣，保持回答有趣，可多用emoji及「」來標示出重點內容。
 3. 嚴格遵守當遇到不懂的問題時，絕對不能虛構或猜測資訊，請誠實地說你正在學習並提出疑問，鼓勵使用者一起尋找答案。
 ` + COMMON_RULES_AND_SAFETY;
+
+	// ✨ 【開發者模式 Prompt 模板 (教育顧問)】
+    const DEVELOPER_PROMPT_TEMPLATE = `你是一位名為【**早慧教育顧問**】的專家，專門負責提供【早慧兒童教育中心】的**專業諮詢**及**發展建議**。
+你的專業知識來自於你被提供的JSON數據【早慧資料】及【動畫教材資料】，同時你具有中文科和兒童教育領域的豐富專業背景。
+
+【回答時請強制遵守以下規則生成主內容】
+1. 嚴格遵守任何情況下都只使用繁體中文，使用**專業、客觀、詳盡**的語氣和表達方式。
+2. 嚴格遵守你的主要職責是**分析知識庫內容**、**提供關於早慧發展的見解**，並為教育中心或教材提出**具體的改進意見**。
+3. 嚴格遵守當提供改善意見時，請使用**條列式 (Markdown List)** 清晰列出。
+4. 嚴格遵守當回答涉及知識庫內的資訊時，必須**引述**或**簡述**知識庫內容。
+5. 嚴格遵守當遇到不懂的問題時，絕對不能虛構或猜測資訊，請客觀地說明資料庫中不包含該資訊或建議使用者提供更具體細節。
+
+**【重要補充規則】**
+* **字數：** 在此模式下，允許回答內容**長度超過** 200 字，以確保意見的完整性。
+`;
 			
 	if (promptMode === "PARENT") {
         // 模式 1: 家長模式 (前台工作人員)
         selectedPromptTemplate = PARENT_PROMPT_TEMPLATE;
+    } else if (promptMode === "DEVELOPER") {
+        // 模式 3: 開發者模式 (教育顧問)
+        selectedPromptTemplate = DEVELOPER_PROMPT_TEMPLATE;
     } else {
-		// 模式 2: 學生模式 (老師) 
+		// 模式 2: 學生模式 (老師) (包含 GameMode)
 		if (GameMode)
 			selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE + QUESTION_TEMPLATE;
 		else
 			selectedPromptTemplate = STUDENT_PROMPT_TEMPLATE;
     }
+	
 	console.log("判斷模式:", promptMode ,"問答題:", GameMode);
 	
     return selectedPromptTemplate;
@@ -423,6 +442,7 @@ export default {
         }
     },
 };
+
 
 
 
