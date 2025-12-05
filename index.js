@@ -342,9 +342,9 @@ export default {
 			if(model === "primary"){
 				finalmodel = "kwaipilot/kat-coder-pro:free";
 			} else if (model === "secondary") {
-				finalmodel = "x-ai/grok-4.1-fast:free";
+				finalmodel = "amazon/nova-2-lite-v1:free";
 			}  else {
-				finalmodel = "meta-llama/llama-4-maverick:free";
+				finalmodel = "mistralai/mistral-small-3.1-24b-instruct:free";
 			}
 			console.log("Model:", finalmodel);
 
@@ -442,6 +442,7 @@ export default {
         }
     },
 };
+
 
 
 
