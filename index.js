@@ -340,11 +340,11 @@ export default {
             finalMessages.push(currentUserMessage);
 			
 			if(model === "primary"){
-				finalmodel = "kwaipilot/kat-coder-pro:free";
+				finalmodel = "kwaipilot/kat-coder-pro:free"; //純文字
 			} else if (model === "secondary") {
-				finalmodel = "amazon/nova-2-lite-v1:free";
+				finalmodel = "amazon/nova-2-lite-v1:free"; //可圖文
 			}  else {
-				finalmodel = "mistralai/mistral-small-3.1-24b-instruct:free";
+				finalmodel = "mistralai/mistral-small-3.1-24b-instruct:free"; //backup可圖文
 			}
 			console.log("Model:", finalmodel);
 
@@ -442,6 +442,7 @@ export default {
         }
     },
 };
+
 
 
 
