@@ -342,7 +342,7 @@ export default {
 			if(model === "primary"){
 				finalmodel = "kwaipilot/kat-coder-pro:free"; //純文字
 			} else if (model === "secondary") {
-				finalmodel = "amazon/nova-2-lite-v1:free"; //可圖文
+				finalmodel = "nvidia/nemotron-nano-12b-v2-vl:free"; //可圖文
 			}  else {
 				finalmodel = "mistralai/mistral-small-3.1-24b-instruct:free"; //backup可圖文
 			}
@@ -442,6 +442,7 @@ export default {
         }
     },
 };
+
 
 
 
