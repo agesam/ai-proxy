@@ -340,7 +340,7 @@ export default {
             finalMessages.push(currentUserMessage);
 			
 			if(model === "primary"){
-				finalmodel = "allenai/molmo-2-8b:free"; //純文字
+				finalmodel = "xiaomi/mimo-v2-flash:free"; //純文字
 			} else if (model === "secondary") {
 				finalmodel = "nvidia/nemotron-nano-12b-v2-vl:free"; //可圖文
 			}  else {
@@ -442,6 +442,7 @@ export default {
         }
     },
 };
+
 
 
 
